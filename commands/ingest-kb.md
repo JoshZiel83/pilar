@@ -1,13 +1,13 @@
 ---
-description: Ingest knowledge-base sources into the manifest — propose taxonomy (M1) or incremental update (M2 — not yet implemented)
+description: Ingest knowledge-base sources into the manifest — initial intake or incremental update
 allowed-tools: Bash, Read, Write, Edit
 argument-hint: [knowledge-base-path]
 ---
 
-Ingest sources from the engagement's `knowledge-base/` directory into `knowledge-base/manifest.md` per §6.2 of `scp-plugin-spec.md`. The command operates in two modes:
+Ingest sources from the engagement's `knowledge-base/` directory into `knowledge-base/manifest.md` per §6.2 of `scp-plugin-spec.md`. The command auto-detects mode:
 
-- **Initial intake** (manifest is empty): walk the user-dropped files, propose a taxonomy assignment against the default subfolders seeded by `/pilar:init`, refine with the user, move files into approved subfolders, propose manifest entries, write the manifest, propose the commit. Implemented in M1 (this milestone).
-- **Incremental** (manifest already has entries): detect new files since last ingest, propose entries for them only, append. Implemented in M2 (subsequent milestone).
+- **Initial intake** (manifest is empty): walk the user-dropped files, propose a taxonomy assignment against the default subfolders seeded by `/pilar:init`, refine with the user, move files into approved subfolders, propose manifest entries, write the manifest, propose the commit.
+- **Incremental** (manifest already has entries): detect new files (those whose path is not yet in the manifest), assign each to a subfolder using the existing taxonomy as a guide, propose entries continuing the `REF-NNN` sequence, append to the manifest.
 
 The Librarian role (§4.2) has no QC-style independence contract — the Primary Collaborator runs this workflow with full briefing/roadmap context to make informed taxonomy and metadata proposals.
 
@@ -29,12 +29,18 @@ If `knowledge-base/manifest.md` is missing, **stop** — the engagement is under
 
 ### Step 2 — Determine ingestion mode
 
-Read `knowledge-base/manifest.md`. Count `### REF-NNN` entries under `## Entries` (a regex match for `^### REF-\d{3}$` against the body suffices).
+Read `knowledge-base/manifest.md`. Match `^### REF-\d{3}$` against the body. Capture:
 
-- **Zero entries** → initial-intake mode. Continue with Step 3.
-- **One or more entries** → incremental mode. **Stop** for now and tell the user:
+- `existing_refs` — list of `REF-NNN` ids already in the manifest.
+- `existing_files` — for each existing entry, the value of its `file:` field (used in Step 3 to compute the new-file delta).
+- `next_ref_n` — `max(existing_refs) + 1` (or `1` if `existing_refs` is empty), zero-padded to three digits.
 
-  > `knowledge-base/manifest.md` already has N entries. Incremental ingestion will land in Milestone M2; for now this command only handles initial intake against an empty manifest. If you need to manually add a single entry, edit the manifest directly and run `python3 scripts/validate-schemas.py knowledge-base/manifest.md`.
+Set the mode:
+
+- `existing_refs` is empty → **initial-intake** mode (write a fresh manifest body).
+- `existing_refs` is non-empty → **incremental** mode (append new entries to the existing body).
+
+The flow from Steps 3–11 is shared between modes, with mode-specific branches called out where they differ.
 
 ### Step 3 — Inventory the knowledge-base directory
 
@@ -42,9 +48,15 @@ Run:
 
 !`find knowledge-base -type f \( ! -name '.gitkeep' ! -name 'manifest.md' \) | sort`
 
-If the result is empty, **stop** and tell the user `knowledge-base/` contains no source files yet — drop sources into the directory (loose or pre-organized into subfolders) and re-run.
+Capture the file list as `kb_files` (relative paths to engagement repo root).
 
-Capture the file list as `kb_files`. For each entry, note its current path (relative to engagement repo root).
+**In incremental mode**, compute the new-file delta:
+
+- `new_files` = `kb_files` minus `existing_files` (the file paths already in the manifest from Step 2).
+- If `new_files` is empty, **stop** and tell the user the manifest is already up to date — N entries cover all M sources currently under `knowledge-base/`. No taxonomy work, no commit.
+- Replace `kb_files` with `new_files` for the remainder of the procedure (the work below operates only on the delta).
+
+**In initial-intake mode**, if `kb_files` is empty, **stop** and tell the user `knowledge-base/` contains no source files yet — drop sources into the directory (loose or pre-organized into subfolders) and re-run.
 
 ### Step 4 — Propose taxonomy assignments
 
@@ -55,6 +67,8 @@ Capture the file list as `kb_files`. For each entry, note its current path (rela
 - `guidelines/` — treatment guidelines, consensus statements
 - `competitor/` — clinical or strategic data on competitor products
 - `other/` — anything that does not fit the above (reviews, congress abstracts, regulatory docs, etc.)
+
+**In incremental mode**, the existing manifest may also reveal user-introduced subfolders (any `file:` path whose subfolder is not one of the five defaults). Treat those as additional valid taxonomy slots — the engagement's lived taxonomy is the union of the defaults and whatever the manifest already uses.
 
 For each file in `kb_files`, propose an assignment using filename hints (`alr217`, `pivotal`, `phase` → `clinical/`; `nccn`, `guideline` → `guidelines/`; competitor product names → `competitor/`; etc.) plus, if the file is text-readable (`.md`, `.txt`), a brief glance at the first ~30 lines for clarifying hints. Files already correctly placed under a subfolder receive that subfolder as the proposal (no-op move).
 
@@ -101,7 +115,7 @@ Confirm every file is now under one of the approved subfolders.
 
 Capture today's ISO date with `!date +%F` for the `ingested:` field.
 
-For each file, propose a `### REF-NNN` entry using sequential numbering starting at `REF-001`. Order is the user's call — propose by subfolder (clinical first, then preclinical, etc.) for readable ordering.
+For each file, propose a `### REF-NNN` entry using sequential numbering starting at `next_ref_n` (computed in Step 2 — `REF-001` in initial mode; the next-after-highest-existing in incremental mode, honoring `docs/CONVENTIONS.md`'s append-only rule). Order is the user's call — propose by subfolder (clinical first, then preclinical, etc.) for readable ordering.
 
 Each entry needs the seven §7.4 fields:
 
@@ -118,21 +132,23 @@ Propose all entries as a single block of markdown to the user, preceded by a bri
 
 ### Step 8 — Wait for explicit user approval of the manifest entries
 
-Iterate field-by-field with the user as needed. Citation, key_findings, and population are the three highest-stakes fields — never accept defaults the user has not seen and approved. The user may approve in batch ("all five entries look right, proceed") or per-entry.
+Iterate field-by-field with the user as needed. Citation, key_findings, and population are the three highest-stakes fields — never accept defaults the user has not seen and approved. The user may approve in batch ("all entries look right, proceed") or per-entry.
 
-If the user defers, **stop** without writing the manifest. The taxonomy moves from Step 6 are left in place; the user can resume by re-running `/pilar:ingest-kb` (which will detect the empty manifest and pick up from Step 3).
+If the user defers, **stop** without writing the manifest. The taxonomy moves from Step 6 are left in place; the user can resume by re-running `/pilar:ingest-kb` — incremental mode will pick up the still-uningested files automatically.
 
-### Step 9 — Write `knowledge-base/manifest.md`
+### Step 9 — Write or append to `knowledge-base/manifest.md`
 
-Replace the empty stub manifest with the populated version. Frontmatter:
+Update the manifest's `updated:` frontmatter field to today's ISO date.
+
+**In initial-intake mode**: replace the empty stub body. The frontmatter becomes:
 
 - `artifact: kb-manifest`
 - `project: <project from roadmap.md frontmatter>`
 - `updated: <today's ISO date>`
 
-Body: `# Knowledge Base Manifest` H1, `## Entries` H2, then every approved `### REF-NNN` entry block in agreed order, separated by blank lines.
+Body: `# Knowledge Base Manifest` H1, `## Entries` H2, then every approved `### REF-NNN` entry block in agreed order, separated by blank lines. Use Edit against the stub or Write the full file if the stub body is empty whitespace.
 
-Use the Edit tool against the existing stub (preserving the H1 and H2 headings) by replacing the empty body under `## Entries` with the entry blocks. If Edit cannot match cleanly (because the stub body is just whitespace), write the full file with the Write tool.
+**In incremental mode**: append the new entry blocks under `## Entries` after the last existing `### REF-NNN` entry, separated by blank lines. Use the Edit tool with `old_string` matching the last few lines of the existing final entry plus the trailing newline; `new_string` is those same lines plus the new entry blocks. Do not touch the existing entries' content — append-only. Update the `updated:` frontmatter via a separate Edit.
 
 ### Step 10 — Validate the manifest
 
@@ -146,16 +162,26 @@ If validation fails, surface the errors to the user. Correct the manifest with t
 
 Run `git status` to show the staged and unstaged changes (file moves + manifest write).
 
-Propose this commit message (substitute the entry count):
+**In initial-intake mode**, propose this commit message (substitute the entry count `N`):
 
 ```
-feat(p6-m1): initial KB intake — N sources catalogued
+chore(pilar): initial KB intake — N sources catalogued
 
 Initial knowledge-base ingestion via /pilar:ingest-kb. Files
 categorized into the §3 default subfolder taxonomy (or user-approved
 extensions); each source has a manifest entry per §7.4 with
 user-confirmed citation, type, design, population, key_findings,
-and tags. Subsequent ingestions append via M2 incremental mode.
+and tags.
+```
+
+**In incremental mode**, propose this commit message (substitute `N` = new entries, `M` = total in manifest after append):
+
+```
+chore(pilar): KB intake — N new source(s) added (M total)
+
+Incremental knowledge-base ingestion via /pilar:ingest-kb. New
+sources appended under existing taxonomy with user-confirmed
+metadata per §7.4.
 ```
 
 Wait for explicit user approval. If approved, run:
@@ -172,16 +198,10 @@ If the user wants to revise the message, accept their version. If the user defer
 
 ### Step 12 — Brief the user on next steps
 
-Tell the user:
+Tell the user (substituting `N` and `M` from Step 11):
 
-> ✓ N sources ingested into `knowledge-base/manifest.md`. Files organized under the approved subfolder taxonomy.
+> ✓ N source(s) ingested. `knowledge-base/manifest.md` now contains M entries; files organized under the approved subfolder taxonomy.
 >
-> Next steps:
->
-> - **Phase 6 M3 (coming soon)** will run an orphan-RS scan after each ingest, automatically proposing `GAP-NNN` entries against pillars whose reference statements lack support in the manifest.
-> - **Phase 6 M4 (coming soon)** ships `/pilar:add-aspirational` for registering aspirational statements per §7.7.
-> - **Phase 7** provides per-pillar drafting commands; reference statements drafted in pillars cite manifest entries by `REF-NNN`.
->
-> If you have additional sources to add later, drop them under `knowledge-base/` and re-run `/pilar:ingest-kb` (incremental mode lands in M2).
+> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` to append them. Once pillars are drafted, run `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md` to flag reference statements lacking support and produce `GAP-NNN` candidates for `registers/evidence-gaps.md`. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
 
 Stop.
