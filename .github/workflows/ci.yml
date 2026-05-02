@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Future jobs, activated as their phase ships (see IMPLEMENTATION_ROADMAP.md):
+#   schema-validate  (Phase 3): every schema in §7 has a template + validator coverage
+#   context-audit    (Phase 5): no QC subagent prompt contains drafting-only inputs
+
+jobs:
+  required-files:
+    name: Required files exist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert required files
+        run: |
+          required=(LICENSE README.md IMPLEMENTATION_ROADMAP.md scp-plugin-spec.md)
+          missing=0
+          for f in "${required[@]}"; do
+            if [[ ! -f "$f" ]]; then
+              echo "::error::Missing required file: $f"
+              missing=1
+            fi
+          done
+          exit $missing
+
+  links:
+    name: Markdown link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # Skip external URLs (rate-limit flakiness); validate internal/relative links only.
+          # Flip the exclude when we want external link verification too.
+          args: --no-progress --exclude '^https?:' '**/*.md'
+          fail: true
+
+  plugin-validate:
+    name: Plugin manifest validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for plugin manifest
+        id: check
+        run: |
+          if [[ ! -d .claude-plugin ]]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::No .claude-plugin/ directory yet — plugin validation activates at Phase 2."
+          fi
+      - name: Set up Node
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Claude Code
+        if: steps.check.outputs.skip != 'true'
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Validate plugin
+        if: steps.check.outputs.skip != 'true'
+        run: claude plugin validate .
