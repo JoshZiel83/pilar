@@ -78,13 +78,22 @@ For the full specification of behavior, artifacts, schemas, and interaction cont
 Install from any Claude Code session:
 
 ```
-/plugin marketplace add JoshZiel83/pilar
+/plugin marketplace add https://github.com/JoshZiel83/pilar
 /plugin install pilar@pilar
 ```
 
 The first command registers this repo as a marketplace (it serves as a single-plugin self-marketplace via `.claude-plugin/marketplace.json`). The second installs the `pilar` plugin from the `pilar` marketplace. After install, the `/pilar:*` slash commands become available.
 
 To update later: `/plugin update pilar@pilar`.
+
+> **Note:** use the full HTTPS URL above. Claude Code's `<owner>/<repo>` shorthand defaults to SSH, which fails if you don't have GitHub SSH keys configured. The HTTPS URL works without SSH and is harder to mistype.
+
+### Troubleshooting
+
+- **`SSH authentication failed` / `Permission denied (publickey)`** — you used the `<owner>/<repo>` shorthand and don't have SSH keys configured for GitHub. Use the full HTTPS URL above.
+- **`Could not read from remote repository`** — the URL is wrong (typo) or you don't have access. Verify the URL exactly matches `https://github.com/JoshZiel83/pilar`.
+- **`Plugin not found` after install** — run `/plugin list` to confirm the install succeeded; restart Claude Code if needed.
+- **Anything else** — please open an issue at <https://github.com/JoshZiel83/pilar/issues> with the exact command you ran and the error you got.
 
 ## Quickstart
 
