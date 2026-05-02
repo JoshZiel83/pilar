@@ -60,7 +60,9 @@ These are locked in early so all later phases plug in cleanly.
 
 ---
 
-### Phase 3 — Schemas, defaults, registers, validator
+### Phase 3 — Schemas, defaults, registers, validator  *(complete)*
+
+**Status.** Closed 2026-05-02 with the **v0.1.0** release tag. All §7 schemas ship with golden fixtures and validator coverage; §9 disallowed-pattern defaults are baked into the style-guide schema; stable-ID conventions are documented in [docs/CONVENTIONS.md](./docs/CONVENTIONS.md) and enforced by the validator. See decisions log and `CHANGELOG.md` for the full closure trail.
 
 **Scope.** All ten artifact templates from §7 with frontmatter and stable-ID conventions; §9 disallowed-pattern defaults seeded into the style guide; lexicon and the two registers (evidence gaps, aspirational statements) as empty-but-valid documents; a read-only schema validator that the plugin can run before commits to catch drift.
 
@@ -177,8 +179,8 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 | §4.3 | Fact-Checker (independence) | P2 stub, P5 real | `agents/fact-checker.md`, `commands/run-qc.md`, `scripts/context-audit.py` | partial |
 | §4.4 | Editor (independence, two contexts) | P5 | `agents/editor.md` | planned |
 | §4.5 | Strategic Reviewer (independence) | P8 | `agents/strategic-reviewer.md` | planned |
-| §5.1 | Roadmap | P3 schema, P4 maintenance | `schemas/roadmap.md`, `/pilar:sprint-close` updates roadmap | planned |
-| §5.2 | Sprint plan | P3 schema, P4 logic | `schemas/sprint-plan.md`, `/pilar:sprint-plan`, `/pilar:sprint-amend` | planned |
+| §5.1 | Roadmap | P3 schema, P4 maintenance | `schemas/roadmap.md`, `/pilar:sprint-close` updates roadmap | partial |
+| §5.2 | Sprint plan | P3 schema, P4 logic | `schemas/sprint-plan.md`, `/pilar:sprint-plan`, `/pilar:sprint-amend` | partial |
 | §5.3 | Sprint-end checkpoint (4 options) | P4 | `/pilar:sprint-close` state machine (Appendix B) | planned |
 | §5.4 | Session resumption | P4 | Session-start orientation in plugin top-level prompt | planned |
 | §6.1 | Briefing & scoping | P4 | Briefing as canonical first sprint | planned |
@@ -186,24 +188,24 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 | §6.3 | Initial evidence synthesis | P6 / P7 | Primary Collaborator workflow before scaffolding | planned |
 | §6.4 | Scaffolding recommendation | P7 | `/pilar:scaffold-pillars` | planned |
 | §6.5 | Per-pillar development | P7 | `/pilar:pillar-narrative`, `/pilar:pillar-statements` | planned |
-| §6.6 | Lexicon & style guide | P3 defaults, P5 enforce, P7 accumulate | `schemas/lexicon.md`, `schemas/style-guide.md`, Editor subagent | planned |
+| §6.6 | Lexicon & style guide | P3 defaults, P5 enforce, P7 accumulate | `schemas/lexicon.md`, `schemas/style-guide.md`, Editor subagent | partial |
 | §6.7 | Consolidation | P8 | `/pilar:consolidate` | planned |
 | §6.8 | Whole-deliverable review | P8 | `/pilar:run-qc --consolidated`, discrete editorial commit | planned |
 | §6.9 | Handoff | P8 / P9 | `/pilar:handoff` (tag + roadmap update) | planned |
-| §7.1 | Roadmap schema | P2 stub, P3 full | `schemas/roadmap.md`, `scripts/validate-schemas.py` | partial |
-| §7.2 | Briefing schema | P3 | `schemas/briefing.md` | planned |
-| §7.3 | Sprint plan & summary schemas | P3 | `schemas/sprint-plan.md`, `schemas/sprint-summary.md` | planned |
-| §7.4 | KB manifest schema | P3 | `schemas/kb-manifest.md` | planned |
-| §7.5 | Pillar file schema | P3 | `schemas/pillar.md` | planned |
-| §7.6 | Evidence gaps register schema | P3 | `schemas/evidence-gaps.md` | planned |
-| §7.7 | Aspirational statements register schema | P3 | `schemas/aspirational-statements.md` | planned |
-| §7.8 | Lexicon schema | P3 | `schemas/lexicon.md` | planned |
-| §7.9 | Style guide schema | P3 | `schemas/style-guide.md` | planned |
-| §7.10 | QC report schemas (3) | P3 | `schemas/{fact-check,editorial,strategic-alignment}-report.md` | planned |
+| §7.1 | Roadmap schema | P2 stub, P3 full | `schemas/roadmap.md`, `scripts/validate-schemas.py` | done |
+| §7.2 | Briefing schema | P3 | `schemas/briefing.md` | done |
+| §7.3 | Sprint plan & summary schemas | P3 | `schemas/sprint-plan.md`, `schemas/sprint-summary.md` | done |
+| §7.4 | KB manifest schema | P3 | `schemas/kb-manifest.md` | done |
+| §7.5 | Pillar file schema | P3 | `schemas/pillar.md` (with nested SS/RS validation) | done |
+| §7.6 | Evidence gaps register schema | P3 | `schemas/evidence-gaps.md` | done |
+| §7.7 | Aspirational statements register schema | P3 | `schemas/aspirational-statements.md` | done |
+| §7.8 | Lexicon schema | P3 | `schemas/lexicon.md` | done |
+| §7.9 | Style guide schema (with §9 defaults baked in) | P3 | `schemas/style-guide.md` | done |
+| §7.10 | QC report schemas (3) | P3 | `schemas/{fact-check,editorial,strategic-alignment}-report.md` | done |
 | §8 | QC rules (independence, sequencing) | P2 isolation proof + P5 + P8 full | `/pilar:run-qc`, `agents/fact-checker.md`, `scripts/context-audit.py` | partial |
-| §9 | Writing style requirements | P3 defaults, P5 enforce | Style-guide template + Editor subagent | planned |
+| §9 | Writing style requirements | P3 defaults, P5 enforce | Style-guide template + Editor subagent | partial |
 | §10 | Evidence enlargement protocol | P6 | Librarian gap detection + search-strategy proposal | planned |
-| §11 | Output translation | out-of-scope | Schemas designed for future translation; stable IDs asserted in P3 | out-of-scope |
+| §11 | Output translation | out-of-scope | Schemas designed for future translation; stable IDs asserted in P3 (see [docs/CONVENTIONS.md](./docs/CONVENTIONS.md)) | out-of-scope |
 | §12 | Tooling and artifact layering | P2, throughout | Engagement-level vs Claude Code task-level separation enforced by directory layout and command behavior | done |
 | §13 | Out of scope | n/a | n/a | out-of-scope |
 
@@ -317,4 +319,5 @@ Append-only. Every decision that affects spec interpretation, schema, or phase b
 | 2026-05-01 | Fold marketplace distribution into P2; add release management to P9; add load-bearing decision #5 (versioning). | Without `.claude-plugin/marketplace.json` the canonical install path (`/plugin marketplace add JoshZiel83/pilar`) cannot be validated until P9 — too late given that P2's whole purpose is to de-risk the install path. Treating distributability as a property the walking skeleton ships with from day one keeps the install UX honest from first commit. | P2, P9, §13 |
 | 2026-05-02 | Document install command using full HTTPS URL (`https://github.com/JoshZiel83/pilar`) rather than `<owner>/<repo>` shorthand. | The shorthand defaults to SSH protocol (`git@github.com:...`) and fails with `Permission denied (publickey)` for users without SSH keys configured — a hostile failure for pilar's audience (medical writers). The HTTPS URL form sidesteps the SSH default and is also typo-resistant (full URL rather than two transcribed identifiers). Verified working by user against the live repo. README also gains a Troubleshooting subsection covering the SSH failure and other common errors. | P2, README install UX |
 | 2026-05-02 | Phase 2 (walking skeleton) closed. | All exit criteria met across six sub-milestones: M1 install UX hardened with HTTPS URL + troubleshooting; M2 roadmap schema (§7.1) + Python validator + `examples/fixtures/roadmap.md` golden file + CI `schema-validate` job; M3 real `/pilar:init` scaffolds the §3 directory tree + seeds roadmap.md from the schema template + intake interview + commit-approval gate; M4 stub Fact-Checker subagent (`agents/fact-checker.md` with `tools: []` for maximum isolation) + `/pilar:run-qc` parent harness using a sentinel-bounded prompt template with a four-variable allowlist; M5 static context-audit (`scripts/context-audit.py`) parses the run-qc template and asserts only allowlisted variables and no forbidden tokens, plus enforces the empty-tools contract on the subagent; CI `context-audit` job activated. The §4/§8 Independence Contract is now both demonstrated (M4) and gated against regression (M5). Phase 3 (full §7 schemas) is the natural next step. | P2 closure |
+| 2026-05-02 | Phase 3 (schemas, defaults, registers, validator) closed; tagged **v0.1.0** as the first user-facing release. | All §7 schemas (briefing, sprint-plan/-summary, kb-manifest, pillar, evidence-gaps, aspirational-statements, lexicon, style-guide, fact-check/editorial/strategic-alignment reports) ship with golden fixtures based on the Aurelis/ALR-217 synthetic engagement; §9 disallowed-pattern defaults baked into the style-guide schema; stable-ID conventions adopted (`REF-NNN`, `P-NN`, `SS-NN`, `RS-NN`, `GAP-NNN`, `ASP-NNN`, `FC-<sprint>-NNN`, `ED-<sprint>-NNN`, `CL-NNN`, `SA-<draft-tag>-NNN`) and enforced by the validator (format checks, uniqueness within scope, nested SS/RS validation in pillar, composite-id reference checks). Conventions documented in `docs/CONVENTIONS.md`. `CHANGELOG.md` initialized in Keep-a-Changelog format. Decision #5 versioning cycle: pin `version: "0.1.0"` for the release commit, then unpin in the immediate follow-up commit so commit-SHA-as-version resumes for ongoing dev. | P3 closure, §7, §9, §11, decision #5 |
 

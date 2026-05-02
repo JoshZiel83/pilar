@@ -2,7 +2,7 @@
 
 > A structured collaborator for medical writers building Scientific Communication Platforms — turns a multi-session, multi-sprint engagement into versioned, schema-conformant, audit-able markdown.
 
-**Status:** pre-release · walking skeleton complete (Phase 2) · in active development. The plugin installs from a Claude Code session, scaffolds an engagement repo via `/pilar:init`, and demonstrates the §4/§8 QC subagent Independence Contract via a stub Fact-Checker (`/pilar:run-qc`). Schema validation and a static context audit gate every commit in CI. Sprint engine, real QC, and per-pillar workflows arrive with subsequent phases — see [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and current phase.
+**Status:** **v0.1.0** (first tagged release) — schema contract locked. The full §7 artifact contract is shipped with stable-ID conventions enforced by the validator on every commit. The §9 dry-scientific-register defaults are baked into the style-guide schema. The plugin installs from a Claude Code session, scaffolds an engagement repo via `/pilar:init`, and demonstrates the §4/§8 QC subagent Independence Contract via a stub Fact-Checker (`/pilar:run-qc`). Real QC evaluation, the sprint engine, and per-pillar workflows arrive with subsequent phases — see [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ---
 
@@ -73,7 +73,7 @@ For the full specification of behavior, artifacts, schemas, and interaction cont
 
 ## Installation
 
-> ⚠️ **Pre-release (Phase 2 — walking skeleton).** The plugin installs, scaffolds an engagement repo via `/pilar:init`, and demonstrates the QC subagent Independence Contract via a stub `/pilar:run-qc`. Real QC evaluation, the sprint engine, and per-pillar development workflows arrive with subsequent phases. ⭐ the repo to follow progress.
+> **v0.1.0 — first tagged release.** The full §7 artifact contract is shipped, validated, and gated. `/pilar:init` scaffolds an engagement repo; `/pilar:run-qc` runs a stub Fact-Checker under the §4/§8 Independence Contract. Real QC evaluation, the sprint engine, and per-pillar workflows arrive with subsequent phases — see [CHANGELOG.md](./CHANGELOG.md) and [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md). ⭐ the repo to follow progress.
 
 Install from any Claude Code session:
 
