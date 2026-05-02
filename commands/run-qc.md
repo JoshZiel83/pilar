@@ -71,33 +71,37 @@ Substitutions:
 
 The variables `{operating_context}`, `{artifact_id}`, `{artifact_path}`, `{lexicon_path}`, and `{style_guide_path}` are the **complete and exhaustive** set of inputs the parent is permitted to pass into the Editor's context. The static context-audit test in `scripts/context-audit.py` enforces this allowlist.
 
-### Step 4 — Parse the Editor's output
+### Step 4 — Inspect what the Editor changed
 
-The Editor returns text containing two H2 blocks:
+The Editor used the **Edit** tool to apply each change surgically directly to `{artifact_path}` during its Task invocation. By the time it returns, the artifact file is already in its post-edit state. The Editor's response contains only its editorial report (no `## EDITED COPY` block — that pattern was retired in the P5 design refinement).
 
-- `## EDITED COPY` — followed by the full edited body (starting with the artifact's H1 line). This is the new body.
-- `## EDITORIAL REPORT` — followed by a YAML+markdown editorial-report document (with its own `---` frontmatter and H1).
+Capture the Editor's response — it should begin with `---` and the editorial-report YAML frontmatter, followed by `# Editorial Report` and the body. Extract this content as `editorial_report_content`. If the Editor's response does not start with the editorial-report frontmatter, **stop** and surface its raw response to the user; the file may already be edited but something is off-spec.
 
-Extract both blocks. If either is missing, malformed, or empty, **stop** and surface the Editor's raw output to the user; do not modify the artifact file. (This protects the artifact from corruption if the Editor's output drifts off-spec.)
+Run:
 
-### Step 5 — Apply the edited body to the artifact
-
-Construct the new artifact file content:
-
-```
-<original frontmatter, byte-identical>
-<the body extracted from ## EDITED COPY>
+```bash
+git diff {artifact_path}
 ```
 
-Show the user a `git diff` of the proposed change. If the diff is non-trivial, briefly summarize the change categories (e.g. "5 lexicon swaps, 2 §9 pattern removals").
+Show the user the diff and summarize the change categories from the editorial report's "Edits Applied Summary" section (e.g. "5 edits applied: 2 lexicon, 2 style, 1 consistency").
 
-Use **Write** to overwrite the artifact file with the new content. Per decision #4, do **not** auto-commit.
+### Step 5 — Sanity-check report claims against the diff
+
+Cross-check the editorial report against the actual diff:
+
+- Parse the report's "Edits Applied Summary" line for the claimed edit count `N`.
+- Count distinct hunks in the `git diff` output.
+- If `N > 0` but the diff is empty (no hunks), the Editor's Edits silently failed — surface the discrepancy to the user and **stop** before invoking Fact-Checker.
+- If `N == 0` and the diff is empty, the Editor legitimately found nothing to edit; proceed.
+- If `N` and the diff hunk count are both nonzero, accept the result and proceed (exact one-to-one matching is not required because surgical edits in adjacent text may merge into a single hunk).
+
+This sanity check catches the failure mode where Edit-tool calls succeed individually but were targeted at text that didn't match (`old_string` mismatch raises an error inside the subagent, which may or may not be reflected in the report).
 
 ### Step 6 — Save the editorial report
 
 Compute the report filename: `qc/editorial-reports/sprint-<NN>-editorial-<slug>.md` where `<NN>` is `roadmap.md::current_sprint` zero-padded and `<slug>` is the artifact's id lowercased with dots → hyphens (e.g. `P-04.SS-01` → `p-04-ss-01`).
 
-Write the editorial-report content (extracted in Step 4) to that path.
+Write `editorial_report_content` (captured in Step 4) to that path.
 
 Validate it: `!python3 scripts/validate-schemas.py qc/editorial-reports/sprint-<NN>-editorial-<slug>.md`. If validation fails, surface the errors to the user but continue (the report is still useful as content).
 

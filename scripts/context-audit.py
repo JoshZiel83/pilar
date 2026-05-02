@@ -81,6 +81,9 @@ QC_HARNESSES: list[dict] = [
             "kb manifest",
             "kb-manifest",
         ],
+        # Fact-Checker reports findings; never edits. Read-only or zero-tool
+        # are the only permissible declarations.
+        "allowed_tools_sets": [set(), {"Read"}],
     },
     {
         "name": "editor",
@@ -108,6 +111,10 @@ QC_HARNESSES: list[dict] = [
             "kb manifest",
             "kb-manifest",
         ],
+        # Editor applies meaning-preserving edits surgically via the Edit tool
+        # (P5 refinement). Read alone (legacy two-block reproduction pattern)
+        # is also still permitted but no longer used by the harness.
+        "allowed_tools_sets": [{"Read"}, {"Read", "Edit"}],
     },
 ]
 
@@ -156,6 +163,36 @@ def audit_run_qc_for_harness(path: Path, run_qc_text: str, harness: dict) -> lis
     return errors
 
 
+def parse_tools_list(line: str) -> set[str] | None:
+    """Parse a frontmatter line like 'tools: [Read, Edit]' into {'Read', 'Edit'}.
+
+    Returns None if the line is not a recognizable tools list. Empty list
+    `tools: []` returns the empty set.
+    """
+    s = line.strip()
+    if not s.startswith("tools:"):
+        return None
+    rest = s[len("tools:") :].strip()
+    if not (rest.startswith("[") and rest.endswith("]")):
+        return None
+    inside = rest[1:-1].strip()
+    if not inside:
+        return set()
+    items = [
+        p.strip().strip('"').strip("'")
+        for p in inside.split(",")
+    ]
+    return {item for item in items if item}
+
+
+def format_tool_sets(sets: list[set[str]]) -> str:
+    """Render a list of allowed tools sets as a human-readable summary."""
+    return ", ".join(
+        "[]" if not s else f"[{', '.join(sorted(s))}]"
+        for s in sets
+    )
+
+
 def audit_subagent_frontmatter(path: Path, harness: dict) -> list[str]:
     if not path.exists():
         return [f"{path}: file does not exist (harness: {harness['name']})"]
@@ -176,16 +213,25 @@ def audit_subagent_frontmatter(path: Path, harness: dict) -> list[str]:
 
     if tools_line is None:
         errors.append(f"{path}: subagent must declare 'tools' in frontmatter")
-    else:
-        normalized = tools_line.replace(" ", "")
-        if normalized not in ("tools:[]", "tools:[Read]"):
-            errors.append(
-                f"{path}: subagent must declare 'tools: []' or 'tools: [Read]' "
-                f"(got: '{tools_line}'); QC subagent isolation requires no "
-                "write/edit/bash/task access — Read is the only permitted tool "
-                "for fetching the artifact + permitted resources from paths the "
-                "parent passes in the prompt"
-            )
+        return errors
+
+    parsed = parse_tools_list(tools_line)
+    if parsed is None:
+        errors.append(
+            f"{path}: could not parse tools declaration '{tools_line}' "
+            "(expected `tools: [Tool1, Tool2, …]`)"
+        )
+        return errors
+
+    allowed_sets: list[set[str]] = harness.get("allowed_tools_sets", [])
+    if parsed not in allowed_sets:
+        errors.append(
+            f"{path}: {harness['name']} declares tools {sorted(parsed) or '[]'} "
+            f"which is not in this harness's allowlist; allowed sets are "
+            f"{format_tool_sets(allowed_sets)}. The Independence Contract "
+            "constrains each QC subagent's filesystem access; loosening it "
+            "requires updating QC_HARNESSES with rationale."
+        )
 
     return errors
 
