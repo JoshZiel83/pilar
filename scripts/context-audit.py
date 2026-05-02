@@ -4,40 +4,39 @@
 Codifies the §4/§8 Independence Contract appendix from
 IMPLEMENTATION_ROADMAP.md as executable policy. Failure means the
 prompt-construction pattern in commands/run-qc.md or the subagent
-isolation in agents/fact-checker.md drifted outside what the spec
-permits the Fact-Checker to see.
+isolation in agents/<role>.md drifted outside what the spec permits
+that role to see.
 
 What this audit checks
 ----------------------
 
-For commands/run-qc.md:
-  - The prompt template enclosed by <<<PILAR_FACT_CHECKER_PROMPT
-    ... PILAR_FACT_CHECKER_PROMPT>>> sentinels exists.
-  - Every {variable} reference inside that template appears in the
-    Fact-Checker allowlist (operating_context, artifact_id,
-    artifact_text, source_texts). Any other {var} = leak.
-  - The template body contains no forbidden tokens corresponding to
-    inputs the contract withholds from the Fact-Checker (briefing,
-    roadmap, lexicon, style guide, drafting rationale, sprint summary,
-    primary collaborator, other pillars, kb manifest).
+For each registered harness in QC_HARNESSES:
 
-For agents/fact-checker.md:
-  - The subagent declares `tools: []` in frontmatter. An empty tools
-    list is the load-bearing isolation guarantee for the Phase 2 stub:
-    no file-system access means the parent's prompt is the entire
-    context the subagent can see.
+For commands/run-qc.md:
+  - The prompt template enclosed by the harness's sentinel pair (e.g.
+    <<<PILAR_FACT_CHECKER_PROMPT … PILAR_FACT_CHECKER_PROMPT>>>) exists.
+  - Every {variable} reference inside that template appears in the
+    harness's allowlist. Any other {var} = leak.
+  - The template body contains no forbidden tokens corresponding to
+    inputs the contract withholds from this role.
+
+For agents/<role>.md:
+  - The subagent declares `tools: []` or `tools: [Read]` in frontmatter.
+    No other tools list is permitted. Read is allowed because the
+    parent passes paths (not inlined content) for the artifact + the
+    role-specific permitted resources, and the subagent reads them.
 
 What this audit does NOT check
 ------------------------------
 
 The agent body intentionally enumerates withheld inputs ("you do not
-receive — and must not request — the briefing, the roadmap, ..."), so
+receive — and must not request — the briefing, the roadmap, …"), so
 forbidden-token scans are NOT applied there. This audit operates on the
 prompt template (parent-controlled content) and on the subagent's
 frontmatter contract.
 
-Phase 5 extends this audit to register Editor and (Phase 8) Strategic
-Reviewer harnesses with their own allowlists and forbidden-token sets.
+The Strategic Reviewer harness will be registered in P8 — adding it is
+a one-entry append to QC_HARNESSES.
 """
 
 from __future__ import annotations
@@ -48,73 +47,118 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 
-# -- Fact-Checker harness contract ---------------------------------------
-
-FACT_CHECKER_ALLOWED_VARS: set[str] = {
-    "{operating_context}",
-    "{artifact_id}",
-    "{artifact_path}",
-    "{source_paths}",
-}
-
-FACT_CHECKER_FORBIDDEN_TOKENS: list[str] = [
-    "briefing",
-    "roadmap",
-    "lexicon",
-    "style guide",
-    "style-guide",
-    "drafting rationale",
-    "sprint summary",
-    "sprint-summary",
-    "primary collaborator",
-    "other pillars",
-    "other pillar",
-    "kb manifest",
-    "kb-manifest",
-]
-
-PROMPT_BLOCK = re.compile(
-    r"<<<PILAR_FACT_CHECKER_PROMPT\n(.*?)\nPILAR_FACT_CHECKER_PROMPT>>>",
-    re.DOTALL,
-)
 VAR_REF = re.compile(r"\{[a-zA-Z_][a-zA-Z0-9_]*\}")
 
 
-def audit_run_qc(path: Path) -> list[str]:
-    if not path.exists():
-        return [f"{path}: file does not exist"]
-    text = path.read_text()
-    m = PROMPT_BLOCK.search(text)
-    if not m:
+# -- QC harness registry -------------------------------------------------
+# Adding a new QC subagent (e.g. Strategic Reviewer at P8) is a single
+# dict appended to this list.
+
+QC_HARNESSES: list[dict] = [
+    {
+        "name": "fact-checker",
+        "agent_path": "agents/fact-checker.md",
+        "sentinel_open": "<<<PILAR_FACT_CHECKER_PROMPT",
+        "sentinel_close": "PILAR_FACT_CHECKER_PROMPT>>>",
+        "allowed_vars": {
+            "{operating_context}",
+            "{artifact_id}",
+            "{artifact_path}",
+            "{source_paths}",
+        },
+        "forbidden_tokens": [
+            "briefing",
+            "roadmap",
+            "lexicon",
+            "style guide",
+            "style-guide",
+            "drafting rationale",
+            "sprint summary",
+            "sprint-summary",
+            "primary collaborator",
+            "other pillars",
+            "other pillar",
+            "kb manifest",
+            "kb-manifest",
+        ],
+    },
+    {
+        "name": "editor",
+        "agent_path": "agents/editor.md",
+        "sentinel_open": "<<<PILAR_EDITOR_PROMPT",
+        "sentinel_close": "PILAR_EDITOR_PROMPT>>>",
+        "allowed_vars": {
+            "{operating_context}",
+            "{artifact_id}",
+            "{artifact_path}",
+            "{lexicon_path}",
+            "{style_guide_path}",
+        },
+        "forbidden_tokens": [
+            "briefing",
+            "roadmap",
+            "drafting rationale",
+            "sprint summary",
+            "sprint-summary",
+            "primary collaborator",
+            "source file",
+            "source files",
+            "fact-check report",
+            "fact-checker report",
+            "kb manifest",
+            "kb-manifest",
+        ],
+    },
+]
+
+
+def extract_prompt_template(text: str, sentinel_open: str, sentinel_close: str) -> str | None:
+    """Return the body between the sentinel markers, or None if missing."""
+    pattern = re.compile(
+        rf"{re.escape(sentinel_open)}\n(.*?)\n{re.escape(sentinel_close)}",
+        re.DOTALL,
+    )
+    m = pattern.search(text)
+    return m.group(1) if m else None
+
+
+def audit_run_qc_for_harness(path: Path, run_qc_text: str, harness: dict) -> list[str]:
+    template = extract_prompt_template(
+        run_qc_text, harness["sentinel_open"], harness["sentinel_close"]
+    )
+    if template is None:
         return [
             f"{path}: prompt-template sentinels "
-            "<<<PILAR_FACT_CHECKER_PROMPT ... PILAR_FACT_CHECKER_PROMPT>>> not found"
+            f"{harness['sentinel_open']} ... {harness['sentinel_close']} not found "
+            f"(harness: {harness['name']})"
         ]
-    template = m.group(1)
+
     errors: list[str] = []
+    name = harness["name"]
+    allowed = harness["allowed_vars"]
 
     found_vars = set(VAR_REF.findall(template))
-    extra = found_vars - FACT_CHECKER_ALLOWED_VARS
+    extra = found_vars - allowed
     for v in sorted(extra):
         errors.append(
-            f"{path}: prompt template uses unallowed variable {v}; "
-            f"Fact-Checker allowlist is {sorted(FACT_CHECKER_ALLOWED_VARS)}"
+            f"{path}: {name} prompt template uses unallowed variable {v}; "
+            f"{name} allowlist is {sorted(allowed)}"
         )
 
     lower = template.lower()
-    for tok in FACT_CHECKER_FORBIDDEN_TOKENS:
+    for tok in harness["forbidden_tokens"]:
         if tok.lower() in lower:
             errors.append(
-                f"{path}: prompt template contains forbidden token '{tok}' — "
-                f"this input is withheld from the Fact-Checker per §4/§8 of the spec"
+                f"{path}: {name} prompt template contains forbidden token '{tok}' — "
+                f"this input is withheld from the {name} per §4/§8 of the spec"
             )
 
     return errors
 
 
-def audit_fact_checker_agent(path: Path) -> list[str]:
+def audit_subagent_frontmatter(path: Path, harness: dict) -> list[str]:
     if not path.exists():
-        return [f"{path}: file does not exist"]
+        return [f"{path}: file does not exist (harness: {harness['name']})"]
     text = path.read_text()
     errors: list[str] = []
 
@@ -139,22 +183,31 @@ def audit_fact_checker_agent(path: Path) -> list[str]:
                 f"{path}: subagent must declare 'tools: []' or 'tools: [Read]' "
                 f"(got: '{tools_line}'); QC subagent isolation requires no "
                 "write/edit/bash/task access — Read is the only permitted tool "
-                "for fetching the artifact + cited sources from paths the parent "
-                "passes in the prompt"
+                "for fetching the artifact + permitted resources from paths the "
+                "parent passes in the prompt"
             )
 
     return errors
 
 
 def main() -> int:
+    run_qc_path = REPO / "commands" / "run-qc.md"
+    if not run_qc_path.exists():
+        print(f"::error::{run_qc_path}: does not exist", file=sys.stderr)
+        return 1
+    run_qc_text = run_qc_path.read_text()
+
     errors: list[str] = []
-    errors.extend(audit_run_qc(REPO / "commands" / "run-qc.md"))
-    errors.extend(audit_fact_checker_agent(REPO / "agents" / "fact-checker.md"))
+    for harness in QC_HARNESSES:
+        errors.extend(audit_run_qc_for_harness(run_qc_path, run_qc_text, harness))
+        errors.extend(
+            audit_subagent_frontmatter(REPO / harness["agent_path"], harness)
+        )
 
     for e in errors:
         print(f"::error::{e}")
 
-    summary = f"Context-audit: {len(errors)} error(s)"
+    summary = f"Context-audit: {len(errors)} error(s) across {len(QC_HARNESSES)} harness(es)"
     print(summary, file=sys.stderr)
 
     return 1 if errors else 0
