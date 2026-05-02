@@ -38,7 +38,9 @@ These are locked in early so all later phases plug in cleanly.
 
 ---
 
-### Phase 2 — Walking skeleton (plugin packaging + subagent isolation + marketplace install path)
+### Phase 2 — Walking skeleton (plugin packaging + subagent isolation + marketplace install path)  *(complete)*
+
+**Status.** Closed 2026-05-02. All exit criteria met — see decisions log.
 
 **Scope.** A minimal but end-to-end-shaped plugin that proves the load-bearing technical decisions AND the canonical marketplace install path before larger phases commit to them.
 
@@ -169,10 +171,10 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 
 | Spec section | Subject | Phase | Plugin surface | Status |
 |---|---|---|---|---|
-| §3 | Project structure & git conventions | P2, P4 | `/pilar:init`, `/pilar:commit-checkpoint`, commit-message proposals | planned |
+| §3 | Project structure & git conventions | P2, P4 | `/pilar:init`, `/pilar:commit-checkpoint`, commit-message proposals | partial |
 | §4.1 | Primary Collaborator | P4 | Plugin top-level prompt + slash commands | planned |
 | §4.2 | KB Librarian | P6 | `agents/librarian.md` (or skill) + `/pilar:ingest-kb` | planned |
-| §4.3 | Fact-Checker (independence) | P2 stub, P5 real | `agents/fact-checker.md` | planned |
+| §4.3 | Fact-Checker (independence) | P2 stub, P5 real | `agents/fact-checker.md`, `commands/run-qc.md`, `scripts/context-audit.py` | partial |
 | §4.4 | Editor (independence, two contexts) | P5 | `agents/editor.md` | planned |
 | §4.5 | Strategic Reviewer (independence) | P8 | `agents/strategic-reviewer.md` | planned |
 | §5.1 | Roadmap | P3 schema, P4 maintenance | `schemas/roadmap.md`, `/pilar:sprint-close` updates roadmap | planned |
@@ -188,7 +190,7 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 | §6.7 | Consolidation | P8 | `/pilar:consolidate` | planned |
 | §6.8 | Whole-deliverable review | P8 | `/pilar:run-qc --consolidated`, discrete editorial commit | planned |
 | §6.9 | Handoff | P8 / P9 | `/pilar:handoff` (tag + roadmap update) | planned |
-| §7.1 | Roadmap schema | P2 stub, P3 full | `schemas/roadmap.md` | planned |
+| §7.1 | Roadmap schema | P2 stub, P3 full | `schemas/roadmap.md`, `scripts/validate-schemas.py` | partial |
 | §7.2 | Briefing schema | P3 | `schemas/briefing.md` | planned |
 | §7.3 | Sprint plan & summary schemas | P3 | `schemas/sprint-plan.md`, `schemas/sprint-summary.md` | planned |
 | §7.4 | KB manifest schema | P3 | `schemas/kb-manifest.md` | planned |
@@ -198,11 +200,11 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 | §7.8 | Lexicon schema | P3 | `schemas/lexicon.md` | planned |
 | §7.9 | Style guide schema | P3 | `schemas/style-guide.md` | planned |
 | §7.10 | QC report schemas (3) | P3 | `schemas/{fact-check,editorial,strategic-alignment}-report.md` | planned |
-| §8 | QC rules (independence, sequencing) | P5, P8 | `/pilar:run-qc` command logic | planned |
+| §8 | QC rules (independence, sequencing) | P2 isolation proof + P5 + P8 full | `/pilar:run-qc`, `agents/fact-checker.md`, `scripts/context-audit.py` | partial |
 | §9 | Writing style requirements | P3 defaults, P5 enforce | Style-guide template + Editor subagent | planned |
 | §10 | Evidence enlargement protocol | P6 | Librarian gap detection + search-strategy proposal | planned |
 | §11 | Output translation | out-of-scope | Schemas designed for future translation; stable IDs asserted in P3 | out-of-scope |
-| §12 | Tooling and artifact layering | P2, throughout | Engagement-level vs Claude Code task-level separation enforced by directory layout and command behavior | planned |
+| §12 | Tooling and artifact layering | P2, throughout | Engagement-level vs Claude Code task-level separation enforced by directory layout and command behavior | done |
 | §13 | Out of scope | n/a | n/a | out-of-scope |
 
 > **Note on distribution infrastructure.** `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `CHANGELOG.md`, the `README.md`, the LICENSE, and CI configuration are implementation infrastructure that supports §13's framing of the spec ("behavior, artifacts, and interaction contracts"). They are not §-mapped requirements — they are the packaging that lets the §-mapped behavior be installed and operated. P2 is responsible for the install-path infrastructure; P9 is responsible for release-management infrastructure.
@@ -314,4 +316,5 @@ Append-only. Every decision that affects spec interpretation, schema, or phase b
 |---|---|---|---|
 | 2026-05-01 | Fold marketplace distribution into P2; add release management to P9; add load-bearing decision #5 (versioning). | Without `.claude-plugin/marketplace.json` the canonical install path (`/plugin marketplace add JoshZiel83/pilar`) cannot be validated until P9 — too late given that P2's whole purpose is to de-risk the install path. Treating distributability as a property the walking skeleton ships with from day one keeps the install UX honest from first commit. | P2, P9, §13 |
 | 2026-05-02 | Document install command using full HTTPS URL (`https://github.com/JoshZiel83/pilar`) rather than `<owner>/<repo>` shorthand. | The shorthand defaults to SSH protocol (`git@github.com:...`) and fails with `Permission denied (publickey)` for users without SSH keys configured — a hostile failure for pilar's audience (medical writers). The HTTPS URL form sidesteps the SSH default and is also typo-resistant (full URL rather than two transcribed identifiers). Verified working by user against the live repo. README also gains a Troubleshooting subsection covering the SSH failure and other common errors. | P2, README install UX |
+| 2026-05-02 | Phase 2 (walking skeleton) closed. | All exit criteria met across six sub-milestones: M1 install UX hardened with HTTPS URL + troubleshooting; M2 roadmap schema (§7.1) + Python validator + `examples/fixtures/roadmap.md` golden file + CI `schema-validate` job; M3 real `/pilar:init` scaffolds the §3 directory tree + seeds roadmap.md from the schema template + intake interview + commit-approval gate; M4 stub Fact-Checker subagent (`agents/fact-checker.md` with `tools: []` for maximum isolation) + `/pilar:run-qc` parent harness using a sentinel-bounded prompt template with a four-variable allowlist; M5 static context-audit (`scripts/context-audit.py`) parses the run-qc template and asserts only allowlisted variables and no forbidden tokens, plus enforces the empty-tools contract on the subagent; CI `context-audit` job activated. The §4/§8 Independence Contract is now both demonstrated (M4) and gated against regression (M5). Phase 3 (full §7 schemas) is the natural next step. | P2 closure |
 
