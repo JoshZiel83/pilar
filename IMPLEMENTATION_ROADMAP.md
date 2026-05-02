@@ -20,6 +20,7 @@ These are locked in early so all later phases plug in cleanly.
 2. **Subagents for the three QC roles** (Editor, Fact-Checker, Strategic Reviewer). Each runs in an isolated context window. The parent passes only the inputs §8 permits — see the Independence Contract appendix below. Defined in `agents/<role>.md`.
 3. **QC sequencing (Editor → Fact-Checker → Strategic Reviewer) is enforced by command logic, not hooks.** Claude Code hooks can block or approve a single tool call but cannot reliably orchestrate a multi-step ordering across separately invocable subagents. `/pilar:run-qc` is the single entry point that invokes the roles in spec-mandated order.
 4. **No auto-commits.** A `/pilar:commit-checkpoint` command stages files, proposes a commit message, and waits for explicit user approval — aligning with §3 ("the plugin proposes commit messages and the user approves them") and Claude Code conventions.
+5. **Versioning strategy.** During active development, `version` is omitted from `plugin.json` so the git commit SHA serves as the version (every push appears to installed clients as an available update — useful for iteration). On releases, `version: "X.Y.Z"` is set explicitly in `plugin.json` to match a git tag (`v0.1.0`, `v0.2.0`, …) and bumped per [semver](https://semver.org/). `CHANGELOG.md` is updated per release in [Keep-a-Changelog](https://keepachangelog.com/) format.
 
 ---
 
@@ -37,20 +38,21 @@ These are locked in early so all later phases plug in cleanly.
 
 ---
 
-### Phase 2 — Walking skeleton (plugin packaging + subagent isolation proof)
+### Phase 2 — Walking skeleton (plugin packaging + subagent isolation + marketplace install path)
 
-**Scope.** A minimal but end-to-end-shaped plugin that proves the load-bearing technical decisions before larger phases commit to them.
+**Scope.** A minimal but end-to-end-shaped plugin that proves the load-bearing technical decisions AND the canonical marketplace install path before larger phases commit to them.
 
-- `.claude-plugin/plugin.json` manifest with `name: pilar` and version 0.1.0.
+- `.claude-plugin/plugin.json` manifest with `name: "pilar"`, `description`, `author`, `homepage`, `repository`, `license: "MIT"`, `keywords`, and `$schema`. `version` is omitted during active dev (commit SHA serves as version per decision #5).
+- `.claude-plugin/marketplace.json` declaring this repo as a single-plugin self-marketplace: `name: "pilar"`, `owner`, and a single plugin entry with `source: "./"`. This is what allows `/plugin marketplace add JoshZiel83/pilar` to work.
 - One slash command `/pilar:init` that scaffolds the §3 directory structure plus a roadmap stub in a target engagement repo.
 - One artifact schema (the roadmap, §7.1) with YAML frontmatter and a stub validator.
 - One **stub Fact-Checker subagent** demonstrating the independence contract: receives only the artifact under review and cited source files, returns a stub fact-check report. Stubbed evaluation; the point is to prove context isolation works.
-- A README for plugin install and a smoke-test script.
-- CI scaffolding that runs the schema validator and a "context audit" assertion.
+- README transitioned from pre-release status to install-verified — install path documented as `/plugin marketplace add JoshZiel83/pilar` → `/plugin install pilar@pilar`.
+- CI scaffolding that runs the schema validator, a context-audit assertion, and `claude plugin validate .` as a release gate.
 
-**Exit criteria.** From a clean shell: install plugin → `/pilar:init` → invoke stub Fact-Checker subagent with constrained context → context-audit assertion passes (no drafting-only inputs leaked into the subagent prompt).
+**Exit criteria.** From a clean Claude Code session: `/plugin marketplace add JoshZiel83/pilar` succeeds → `/plugin install pilar@pilar` succeeds → `/pilar:init` scaffolds an engagement repo → stub Fact-Checker subagent is invoked with a constrained context → context-audit assertion passes (no drafting-only inputs leaked into the subagent prompt) → CI passes including `claude plugin validate .`.
 
-**Risks.** Subagent context isolation is the single hardest technical unknown in the project. If we cannot constrain subagent inputs the way §4 requires, the entire QC architecture must be rethought. Locating this risk in P2 is deliberate.
+**Risks.** Subagent context isolation remains the single hardest technical unknown. Marketplace install path is well-trodden ground but adds a non-trivial verification surface; mitigation is `claude plugin validate .` running in CI from this phase forward. If we cannot constrain subagent inputs the way §4 requires, the entire QC architecture must be rethought. Locating these risks in P2 is deliberate.
 
 **Dependencies.** P1.
 
@@ -143,11 +145,19 @@ Lands after P5 because gap detection and Fact-Checker's "lacks support" finding 
 
 ---
 
-### Phase 9 — Sample engagement, distribution, hardening
+### Phase 9 — Sample engagement, release management, hardening
 
-**Scope.** Dogfood on the synthetic engagement defined in Appendix C below from briefing through handoff. Ship `examples/` with anonymized fixtures (briefing, KB sample, one finished pillar, one full whole-deliverable review cycle). Plugin install/distribution docs. CLAUDE.md authoring guidance for the writer. Final spec-to-implementation traceability audit.
+**Scope.** Dogfood on the synthetic engagement defined in Appendix C below from briefing through handoff. Ship `examples/` with anonymized fixtures (briefing, KB sample, one finished pillar, one full whole-deliverable review cycle). CLAUDE.md authoring guidance for the writer. Final spec-to-implementation traceability audit.
 
-**Exit criteria.** A fresh installer can run the synthetic engagement end-to-end with the user roleplaying the medical writer at each checkpoint; the §-by-§ traceability table is fully green.
+**Release management additions.**
+
+- `CHANGELOG.md` (Keep-a-Changelog format), back-filled to cover the path from `v0.1.0` through `v1.0.0`.
+- Git tag conventions (`v0.1.0`, `v0.2.0`, …, `v1.0.0`) as the release boundary; tags are the source of truth for what a release contains.
+- `claude plugin validate .` as a pre-release gate (CI-enforced from P2 onward).
+- README polished to launch quality: features, quickstart with a real walkthrough, badges, contributing guide, requirements.
+- `1.0.0` release tag at P9 close — first stable, semver-pinned version, with explicit `version: "1.0.0"` in `plugin.json` matching the tag (transitioning out of commit-SHA-as-version per decision #5).
+
+**Exit criteria.** A fresh installer can run the synthetic engagement end-to-end with the user roleplaying the medical writer at each checkpoint; the §-by-§ traceability table is fully green; `v1.0.0` is tagged on `main`; `plugin.json` has `version: "1.0.0"` matching the tag; `CHANGELOG.md` documents the full path from `v0.1.0` to `v1.0.0`.
 
 **Dependencies.** All prior.
 
@@ -194,6 +204,8 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 | §11 | Output translation | out-of-scope | Schemas designed for future translation; stable IDs asserted in P3 | out-of-scope |
 | §12 | Tooling and artifact layering | P2, throughout | Engagement-level vs Claude Code task-level separation enforced by directory layout and command behavior | planned |
 | §13 | Out of scope | n/a | n/a | out-of-scope |
+
+> **Note on distribution infrastructure.** `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `CHANGELOG.md`, the `README.md`, the LICENSE, and CI configuration are implementation infrastructure that supports §13's framing of the spec ("behavior, artifacts, and interaction contracts"). They are not §-mapped requirements — they are the packaging that lets the §-mapped behavior be installed and operated. P2 is responsible for the install-path infrastructure; P9 is responsible for release-management infrastructure.
 
 ---
 
@@ -287,7 +299,7 @@ The fixtures will be hand-authored at P9 time. No real publications, no real pat
 These are recorded here rather than blocking the plan; the user can correct any of them at sign-off or during a later phase.
 
 1. The plugin source lives in this repo; engagements are separate repos that install the plugin. *(If the user prefers the plugin live alongside a real engagement, P2 packaging changes.)*
-2. Plugin distribution is local-install initially (e.g. `claude --plugin-dir ./pilar`); a marketplace listing is out of scope.
+2. This repo is its own marketplace from P2 onward — a single-plugin self-marketplace at `.claude-plugin/marketplace.json` with `source: "./"`. Multi-plugin marketplace expansion (hosting other plugins under the same marketplace) is out of scope.
 3. The synthetic engagement scenario (Appendix C) is invented. If the user has a real anonymizable scenario they prefer for dogfooding, it replaces Appendix C.
 4. CI for the plugin repo (running schema validator + context-audit tests) is set up in P2 alongside the walking skeleton.
 5. The plugin uses the slash-command prefix `/pilar:` for all user-facing entry points. (Consistent with the plugin name; can be changed before P2.)
@@ -300,5 +312,5 @@ Append-only. Every decision that affects spec interpretation, schema, or phase b
 
 | Date | Decision | Rationale | Phase / spec § |
 |---|---|---|---|
-| *(none yet)* | | | |
+| 2026-05-01 | Fold marketplace distribution into P2; add release management to P9; add load-bearing decision #5 (versioning). | Without `.claude-plugin/marketplace.json` the canonical install path (`/plugin marketplace add JoshZiel83/pilar`) cannot be validated until P9 — too late given that P2's whole purpose is to de-risk the install path. Treating distributability as a property the walking skeleton ships with from day one keeps the install UX honest from first commit. | P2, P9, §13 |
 
