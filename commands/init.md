@@ -44,6 +44,7 @@ mkdir -p \
   knowledge-base/other \
   pillars \
   registers \
+  explorations \
   qc/fact-check-reports \
   qc/editorial-reports \
   qc/strategic-alignment-reports \
@@ -51,13 +52,15 @@ mkdir -p \
 
 for d in \
   knowledge-base/clinical knowledge-base/preclinical knowledge-base/guidelines knowledge-base/competitor knowledge-base/other \
-  pillars registers \
+  pillars registers explorations \
   qc/fact-check-reports qc/editorial-reports qc/strategic-alignment-reports \
   sprints
 do
   touch "$d/.gitkeep"
 done
 ```
+
+Note on `explorations/`: this directory holds optional per-pillar exploration notes produced by `/pilar:explore` (a P7 refinement). Files in this directory are scratch markdown — not §7 artifacts — and are not validated by `scripts/validate-schemas.py`. The directory is committed (with `.gitkeep`) so future `/pilar:explore` invocations have a stable target path.
 
 ### Step 4 — Intake interview
 
