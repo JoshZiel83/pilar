@@ -43,14 +43,14 @@ These are locked in early so all later phases plug in cleanly.
 **Scope.** A minimal but end-to-end-shaped plugin that proves the load-bearing technical decisions AND the canonical marketplace install path before larger phases commit to them.
 
 - `.claude-plugin/plugin.json` manifest with `name: "pilar"`, `description`, `author`, `homepage`, `repository`, `license: "MIT"`, `keywords`, and `$schema`. `version` is omitted during active dev (commit SHA serves as version per decision #5).
-- `.claude-plugin/marketplace.json` declaring this repo as a single-plugin self-marketplace: `name: "pilar"`, `owner`, and a single plugin entry with `source: "./"`. This is what allows `/plugin marketplace add JoshZiel83/pilar` to work.
+- `.claude-plugin/marketplace.json` declaring this repo as a single-plugin self-marketplace: `name: "pilar"`, `owner`, and a single plugin entry with `source: "./"`. This is what allows `/plugin marketplace add https://github.com/JoshZiel83/pilar` to work.
 - One slash command `/pilar:init` that scaffolds the §3 directory structure plus a roadmap stub in a target engagement repo.
 - One artifact schema (the roadmap, §7.1) with YAML frontmatter and a stub validator.
 - One **stub Fact-Checker subagent** demonstrating the independence contract: receives only the artifact under review and cited source files, returns a stub fact-check report. Stubbed evaluation; the point is to prove context isolation works.
-- README transitioned from pre-release status to install-verified — install path documented as `/plugin marketplace add JoshZiel83/pilar` → `/plugin install pilar@pilar`.
+- README transitioned from pre-release status to install-verified — install path documented as `/plugin marketplace add https://github.com/JoshZiel83/pilar` → `/plugin install pilar@pilar`. (HTTPS URL is required because the `<owner>/<repo>` shorthand defaults to SSH, which fails for users without SSH keys configured.)
 - CI scaffolding that runs the schema validator, a context-audit assertion, and `claude plugin validate .` as a release gate.
 
-**Exit criteria.** From a clean Claude Code session: `/plugin marketplace add JoshZiel83/pilar` succeeds → `/plugin install pilar@pilar` succeeds → `/pilar:init` scaffolds an engagement repo → stub Fact-Checker subagent is invoked with a constrained context → context-audit assertion passes (no drafting-only inputs leaked into the subagent prompt) → CI passes including `claude plugin validate .`.
+**Exit criteria.** From a clean Claude Code session: `/plugin marketplace add https://github.com/JoshZiel83/pilar` succeeds → `/plugin install pilar@pilar` succeeds → `/pilar:init` scaffolds an engagement repo → stub Fact-Checker subagent is invoked with a constrained context → context-audit assertion passes (no drafting-only inputs leaked into the subagent prompt) → CI passes including `claude plugin validate .`.
 
 **Risks.** Subagent context isolation remains the single hardest technical unknown. Marketplace install path is well-trodden ground but adds a non-trivial verification surface; mitigation is `claude plugin validate .` running in CI from this phase forward. If we cannot constrain subagent inputs the way §4 requires, the entire QC architecture must be rethought. Locating these risks in P2 is deliberate.
 
@@ -313,4 +313,5 @@ Append-only. Every decision that affects spec interpretation, schema, or phase b
 | Date | Decision | Rationale | Phase / spec § |
 |---|---|---|---|
 | 2026-05-01 | Fold marketplace distribution into P2; add release management to P9; add load-bearing decision #5 (versioning). | Without `.claude-plugin/marketplace.json` the canonical install path (`/plugin marketplace add JoshZiel83/pilar`) cannot be validated until P9 — too late given that P2's whole purpose is to de-risk the install path. Treating distributability as a property the walking skeleton ships with from day one keeps the install UX honest from first commit. | P2, P9, §13 |
+| 2026-05-02 | Document install command using full HTTPS URL (`https://github.com/JoshZiel83/pilar`) rather than `<owner>/<repo>` shorthand. | The shorthand defaults to SSH protocol (`git@github.com:...`) and fails with `Permission denied (publickey)` for users without SSH keys configured — a hostile failure for pilar's audience (medical writers). The HTTPS URL form sidesteps the SSH default and is also typo-resistant (full URL rather than two transcribed identifiers). Verified working by user against the live repo. README also gains a Troubleshooting subsection covering the SSH failure and other common errors. | P2, README install UX |
 
