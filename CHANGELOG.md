@@ -6,7 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-Phases 4, 5, 6, and 7 closed: sprint engine + Primary Collaborator core (P4); Editor and Fact-Checker subagents with the Independence Contract codified for real evaluation (P5); KB Librarian with intake, gap detection, and aspirational-statement registration (P6); per-pillar development with scaffolding + narrative + statements + status state machine (P7). Not yet tagged — release tagging is user-gated.
+Phases 4, 5, 6, and 7 closed: sprint engine + Primary Collaborator core (P4); Editor and Fact-Checker subagents with the Independence Contract codified for real evaluation (P5); KB Librarian with intake, gap detection, and aspirational-statement registration (P6); per-pillar development with scaffolding + narrative + statements + status state machine (P7). P7 refinement landed: bounded exploration command for source-content reads. Not yet tagged — release tagging is user-gated.
+
+### P7 refinement
+
+- **`/pilar:explore <pillar-id> [--angle "<hypothesis>"]`** — bounded, hypothesis-driven per-pillar exploration of KB source content. The writer brings a one-sentence angle; the command ranks manifest REFs by likely relevance, lets the user pick which to dig into, and uses the Read tool on the picked source files (PDFs included via the Read tool's `pages` parameter — defaulting to first 10 pages with user opt-in for deeper page ranges). Surfaces key passages and concepts; produces a 1–2 paragraph synthesis covering what the exploration supports, refutes, or suggests. Discarded by default; on save, appends a dated H2 section to `explorations/<pillar_id>.md` (one file per pillar; sections accumulate across invocations). Closes the original P7 gap where `/pilar:pillar-narrative` reads manifest entries grouped by `type` and `/pilar:pillar-statements` surfaces REF metadata, but neither command opens source files. (commands/explore.md)
+- **`/pilar:init` extended** — `explorations/` directory added to the §3 directory tree alongside `pillars/`, `registers/`, `sprints/`, `qc/`, `knowledge-base/`. Holds optional per-pillar exploration notes; the directory is committed (with `.gitkeep`) but its files are scratch markdown — not §7 artifacts and not schema-validated. (commands/init.md)
+- **`examples/p7-fixtures/explorations/p-04.md`** — sample saved-exploration file with two H2 sections (durability angle grounded in REF-001's Limitations; safety-as-differentiation angle grounded in REF-001 + REF-002). The fixture README documents the manual smoke test for `/pilar:explore` and the deliberate non-validation of exploration files.
 
 ### Added (Phase 7)
 
