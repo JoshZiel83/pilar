@@ -19,7 +19,7 @@ jobs:
     name: Required files exist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Assert required files
         run: |
           required=(LICENSE README.md IMPLEMENTATION_ROADMAP.md scp-plugin-spec.md)
@@ -36,7 +36,7 @@ jobs:
     name: Markdown link check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Lychee
         uses: lycheeverse/lychee-action@v2
         with:
@@ -49,7 +49,7 @@ jobs:
     name: Plugin manifest validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Check for plugin manifest
         id: check
         run: |
@@ -76,7 +76,7 @@ jobs:
     name: Schema validation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
@@ -87,7 +87,7 @@ jobs:
     name: QC subagent context audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: '3.x'
