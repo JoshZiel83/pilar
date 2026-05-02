@@ -1,0 +1,11 @@
+SYNTHETIC FIXTURE SOURCE — for pilar QC dogfooding only.
+
+Title: ALR-217 Pivotal Phase 2 Study in Relapsed/Refractory DLBCL — Primary Analysis
+
+Methods. Open-label, single-arm, multi-center Phase 2 study evaluating ALR-217 monotherapy in adults with relapsed/refractory diffuse large B-cell lymphoma (DLBCL) who had received at least 2 prior lines of therapy, including either anti-CD20-based immunochemotherapy or CAR-T cell therapy. Primary endpoint was overall response rate (ORR) by independent review at week 24.
+
+Results. The overall response rate at the protocol-defined primary analysis was 35% (95% CI 28–42) at a median follow-up of 6 months. The safety profile was dominated by manageable cytopenias and infections; no clinically significant cardiac signals were observed.
+
+Limitations. The study is single-arm with no comparator; long-term follow-up including overall survival has not yet been reported. Durability of response and overall survival will be evaluated in subsequent analyses.
+
+Conclusions. ALR-217 demonstrates activity in heavily pre-treated r/r DLBCL with a manageable safety profile. Comparative effectiveness against active comparators and durability of response remain to be established in subsequent reporting.

@@ -6,9 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-Phase 4 closed: sprint engine + Primary Collaborator core. Not yet tagged — release tagging is user-gated.
+Phases 4 and 5 closed: sprint engine + Primary Collaborator core (P4); Editor and Fact-Checker subagents with the Independence Contract codified for real evaluation (P5). Not yet tagged — release tagging is user-gated.
 
-### Added
+### Added (Phase 5)
+
+- **Real Fact-Checker subagent** (replacing the P2 walking-skeleton stub). `agents/fact-checker.md` upgraded to `tools: [Read]` with a path-based prompt template; performs real evaluation against cited sources, flagging overstatement, misattribution, source-strength mismatch, unsupported claims, and undefensible scientific-statement syntheses. Produces schema-conformant fact-check reports per §7.10.
+- **Editor subagent** (`agents/editor.md`). Single file handling both `drafting` and `consolidated-draft` operating contexts via an `operating_context` flag. Permitted edits per §4.4/§6.6 (lexicon swaps, §9 disallowed-pattern removal, tightening, cross-pillar harmonization in consolidated context); prohibited edits enumerated. Two-block output: `## EDITED COPY` (full edited body) + `## EDITORIAL REPORT` (schema-conformant per §7.10).
+- **`/pilar:run-qc` Editor → Fact-Checker sequencing.** Per §8 the Editor runs first; the parent applies the edited body to the artifact file (frontmatter preserved byte-identical); the Fact-Checker runs on the post-Editor artifact. Discrete editorial commit at consolidated-draft context per §6.8. Sequencing enforced in command logic per decision #3.
+- **`scripts/context-audit.py` registry pattern.** Refactored to `QC_HARNESSES` list of dicts; Editor harness registered with its own `allowed_vars` and `forbidden_tokens`. Adding the Strategic Reviewer at P8 is a one-entry append. Tools-list assertion loosened to `tools: []` or `tools: [Read]`.
+- **`examples/qc-fixtures/`** — self-contained QC test scenario (P-99 pillar with intentionally-bad RS, two-entry lexicon, style-guide with §9 defaults, kb-manifest, synthetic source content) for manual `/pilar:run-qc` smoke testing.
+
+### Added (Phase 4)
 
 - `/pilar:sprint-plan` — opens a new sprint by drafting a plan from roadmap state and the prior sprint summary. Sprint-1 special case for briefing has pre-populated objectives. Writes `sprints/sprint-NN/plan.md`, updates roadmap (`current_sprint`, Active Workstreams), proposes commit message inline, waits for user approval. (commands/sprint-plan.md)
 - `/pilar:sprint-close` — closes the active sprint at the §5.3 checkpoint. Drafts the summary from work actually completed, presents at the checkpoint, executes the four-option state machine (Confirm / Request revisions [bounded or substantive] / Defer / Rewind) with branch-specific roadmap updates. Each terminal branch proposes its own commit message inline. (commands/sprint-close.md)
