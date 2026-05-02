@@ -74,7 +74,9 @@ These are locked in early so all later phases plug in cleanly.
 
 ---
 
-### Phase 4 — Sprint engine + Primary Collaborator core  *(briefing merged in)*
+### Phase 4 — Sprint engine + Primary Collaborator core  *(briefing merged in)*  *(complete)*
+
+**Status.** Closed 2026-05-02. `/pilar:init` extended to seed the full set of engagement-artifact stubs and a CLAUDE.md (M1); `/pilar:sprint-plan` drafts and commits sprint plans from roadmap state with §5.3 checkpoint discipline (M2); `/pilar:sprint-close` implements the four-option checkpoint state machine — Confirm / Request revisions (bounded or substantive) / Defer / Rewind — with branch-specific roadmap updates and inline commit-message proposals (M3); `/pilar:sprint-amend` handles in-flight plan revisions per §5.2 (M4); seven seeded engagement-artifact stubs validated clean against the schema validator in a smoke-test simulation (M5). No release tagged at this phase per release-gating policy.
 
 **Scope.** Briefing is a sprint per §5.3, so the sprint engine and the briefing flow are built together to avoid duplicating checkpoint plumbing.
 
@@ -173,17 +175,17 @@ Updated at the close of every phase. Status legend: `planned` (in scope of named
 
 | Spec section | Subject | Phase | Plugin surface | Status |
 |---|---|---|---|---|
-| §3 | Project structure & git conventions | P2, P4 | `/pilar:init`, `/pilar:commit-checkpoint`, commit-message proposals | partial |
-| §4.1 | Primary Collaborator | P4 | Plugin top-level prompt + slash commands | planned |
+| §3 | Project structure & git conventions | P2, P4 | `/pilar:init` (full §3 tree + all engagement-artifact stubs), `/pilar:sprint-plan`/`-close`/`-amend` propose commit messages inline | done |
+| §4.1 | Primary Collaborator | P4 | CLAUDE.md auto-load + sprint slash commands drive every meaningful interaction | done |
 | §4.2 | KB Librarian | P6 | `agents/librarian.md` (or skill) + `/pilar:ingest-kb` | planned |
 | §4.3 | Fact-Checker (independence) | P2 stub, P5 real | `agents/fact-checker.md`, `commands/run-qc.md`, `scripts/context-audit.py` | partial |
 | §4.4 | Editor (independence, two contexts) | P5 | `agents/editor.md` | planned |
 | §4.5 | Strategic Reviewer (independence) | P8 | `agents/strategic-reviewer.md` | planned |
-| §5.1 | Roadmap | P3 schema, P4 maintenance | `schemas/roadmap.md`, `/pilar:sprint-close` updates roadmap | partial |
-| §5.2 | Sprint plan | P3 schema, P4 logic | `schemas/sprint-plan.md`, `/pilar:sprint-plan`, `/pilar:sprint-amend` | partial |
-| §5.3 | Sprint-end checkpoint (4 options) | P4 | `/pilar:sprint-close` state machine (Appendix B) | planned |
-| §5.4 | Session resumption | P4 | Session-start orientation in plugin top-level prompt | planned |
-| §6.1 | Briefing & scoping | P4 | Briefing as canonical first sprint | planned |
+| §5.1 | Roadmap | P3 schema, P4 maintenance | `schemas/roadmap.md`, `/pilar:sprint-plan` and `/pilar:sprint-close` mutate roadmap with targeted edits | done |
+| §5.2 | Sprint plan | P3 schema, P4 logic | `schemas/sprint-plan.md`, `/pilar:sprint-plan`, `/pilar:sprint-amend` | done |
+| §5.3 | Sprint-end checkpoint (4 options) | P4 | `/pilar:sprint-close` state machine encoding Appendix B in command body | done |
+| §5.4 | Session resumption | P4 | CLAUDE.md auto-loaded from engagement repo root (dropped by `/pilar:init`) | done |
+| §6.1 | Briefing & scoping | P4 | Briefing implemented as Sprint 1 special case in `/pilar:sprint-plan` | done |
 | §6.2 | KB initial intake | P6 | `/pilar:ingest-kb` | planned |
 | §6.3 | Initial evidence synthesis | P6 / P7 | Primary Collaborator workflow before scaffolding | planned |
 | §6.4 | Scaffolding recommendation | P7 | `/pilar:scaffold-pillars` | planned |
@@ -320,4 +322,5 @@ Append-only. Every decision that affects spec interpretation, schema, or phase b
 | 2026-05-02 | Document install command using full HTTPS URL (`https://github.com/JoshZiel83/pilar`) rather than `<owner>/<repo>` shorthand. | The shorthand defaults to SSH protocol (`git@github.com:...`) and fails with `Permission denied (publickey)` for users without SSH keys configured — a hostile failure for pilar's audience (medical writers). The HTTPS URL form sidesteps the SSH default and is also typo-resistant (full URL rather than two transcribed identifiers). Verified working by user against the live repo. README also gains a Troubleshooting subsection covering the SSH failure and other common errors. | P2, README install UX |
 | 2026-05-02 | Phase 2 (walking skeleton) closed. | All exit criteria met across six sub-milestones: M1 install UX hardened with HTTPS URL + troubleshooting; M2 roadmap schema (§7.1) + Python validator + `examples/fixtures/roadmap.md` golden file + CI `schema-validate` job; M3 real `/pilar:init` scaffolds the §3 directory tree + seeds roadmap.md from the schema template + intake interview + commit-approval gate; M4 stub Fact-Checker subagent (`agents/fact-checker.md` with `tools: []` for maximum isolation) + `/pilar:run-qc` parent harness using a sentinel-bounded prompt template with a four-variable allowlist; M5 static context-audit (`scripts/context-audit.py`) parses the run-qc template and asserts only allowlisted variables and no forbidden tokens, plus enforces the empty-tools contract on the subagent; CI `context-audit` job activated. The §4/§8 Independence Contract is now both demonstrated (M4) and gated against regression (M5). Phase 3 (full §7 schemas) is the natural next step. | P2 closure |
 | 2026-05-02 | Phase 3 (schemas, defaults, registers, validator) closed; tagged **v0.1.0** as the first user-facing release. | All §7 schemas (briefing, sprint-plan/-summary, kb-manifest, pillar, evidence-gaps, aspirational-statements, lexicon, style-guide, fact-check/editorial/strategic-alignment reports) ship with golden fixtures based on the Aurelis/ALR-217 synthetic engagement; §9 disallowed-pattern defaults baked into the style-guide schema; stable-ID conventions adopted (`REF-NNN`, `P-NN`, `SS-NN`, `RS-NN`, `GAP-NNN`, `ASP-NNN`, `FC-<sprint>-NNN`, `ED-<sprint>-NNN`, `CL-NNN`, `SA-<draft-tag>-NNN`) and enforced by the validator (format checks, uniqueness within scope, nested SS/RS validation in pillar, composite-id reference checks). Conventions documented in `docs/CONVENTIONS.md`. `CHANGELOG.md` initialized in Keep-a-Changelog format. Decision #5 versioning cycle: pin `version: "0.1.0"` for the release commit, then unpin in the immediate follow-up commit so commit-SHA-as-version resumes for ongoing dev. | P3 closure, §7, §9, §11, decision #5 |
+| 2026-05-02 | Phase 4 (sprint engine + Primary Collaborator core, briefing merged in) closed. **No release tag** — release-tagging is now user-gated per the saved release policy and was not authorized for P4 closure. | Five sub-milestones: M1 extends `/pilar:init` to seed the seven engagement-artifact stubs (`roadmap.md`, `briefing.md`, `style-guide.md` with §9 defaults inherited, `lexicon.md`, `knowledge-base/manifest.md`, two registers) plus a static `CLAUDE.md` template that triggers session resumption (§5.4) on every Claude Code session start in the engagement directory. M2 ships `/pilar:sprint-plan` with the §5.2 sprint-opening flow + Sprint-1 briefing-sprint defaults. M3 ships `/pilar:sprint-close` encoding the §5.3 four-option checkpoint state machine (Confirm / Request revisions [bounded or substantive] / Defer / Rewind) with branch-specific roadmap updates. M4 ships `/pilar:sprint-amend` for in-flight plan revisions per §5.2 second paragraph. M5 verified via simulated scaffolding — seven seeded artifact stubs validate clean against `scripts/validate-schemas.py`. Design decisions: CLAUDE.md auto-load over a `/pilar:resume` command (user choice this session); inline commit-message proposals in each sprint command rather than a shared `/pilar:commit-checkpoint` helper (user choice this session). | P4 closure, §3, §4.1, §5.1–§5.4, §6.1 |
 

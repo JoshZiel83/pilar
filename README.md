@@ -2,7 +2,7 @@
 
 > A structured collaborator for medical writers building Scientific Communication Platforms — turns a multi-session, multi-sprint engagement into versioned, schema-conformant, audit-able markdown.
 
-**Status:** **v0.1.0** (first tagged release) — schema contract locked. The full §7 artifact contract is shipped with stable-ID conventions enforced by the validator on every commit. The §9 dry-scientific-register defaults are baked into the style-guide schema. The plugin installs from a Claude Code session, scaffolds an engagement repo via `/pilar:init`, and demonstrates the §4/§8 QC subagent Independence Contract via a stub Fact-Checker (`/pilar:run-qc`). Real QC evaluation, the sprint engine, and per-pillar workflows arrive with subsequent phases — see [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and [CHANGELOG.md](./CHANGELOG.md) for release history.
+**Status:** **v0.1.0** (first tagged release) + **Phase 4 sprint engine shipped on `main`** (untagged). The plugin installs from a Claude Code session and scaffolds a fully populated engagement repo via `/pilar:init` (roadmap + briefing + style-guide with §9 defaults + lexicon + KB manifest + two registers + CLAUDE.md). `/pilar:sprint-plan`, `/pilar:sprint-close` (with the §5.3 four-option checkpoint state machine), and `/pilar:sprint-amend` drive the sprint workflow. The §4/§8 QC subagent Independence Contract is demonstrated via a stub Fact-Checker (`/pilar:run-qc`). Real QC evaluation and per-pillar workflows arrive with subsequent phases — see [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ---
 
@@ -97,19 +97,20 @@ To update later: `/plugin update pilar@pilar`.
 
 ## Quickstart
 
-> The first command (`/pilar:init`) is functional today and can scaffold a fresh engagement repo. `/pilar:sprint-plan` and `/pilar:sprint-close` ship with Phase 4 (sprint engine).
-
 ```
 # In a fresh directory that will become your engagement repo:
-/pilar:init                    # scaffolds the engagement directory structure + roadmap stub
-/pilar:sprint-plan             # opens the briefing sprint
-                               # (the plugin interviews you, drafts the sprint plan, you approve)
-# ... briefing happens across one or more sessions ...
-/pilar:sprint-close            # produces the structured sprint summary,
-                               # presents it for Confirm / Revise / Defer / Rewind
+/pilar:init                    # scaffolds engagement directory structure + all artifact stubs + CLAUDE.md
+/pilar:sprint-plan             # opens the briefing sprint (Sprint 1 special case)
+                               # plugin drafts the plan; you approve before commit
+# ... conduct the briefing in conversation ...
+/pilar:sprint-close            # presents the structured sprint summary;
+                               # respond Confirm / Request revisions / Defer / Rewind
+# ... next sprint planned from the prior summary's "Next Sprint Proposed Scope" ...
 ```
 
-The `/pilar:init` command will scaffold the directory structure described in §3 of the spec, create the initial `roadmap.md`, and orient you for the first sprint. Subsequent sessions will start with pilar reading the roadmap, the most recent sprint summary, and any active sprint plan to orient you to current state before any work resumes.
+`/pilar:init` scaffolds the §3 directory structure plus seeded stubs for `roadmap.md`, `briefing.md`, `style-guide.md` (with §9 disallowed-pattern defaults), `lexicon.md`, `knowledge-base/manifest.md`, and the two registers — all schema-conformant from creation. It also drops a `CLAUDE.md` so Claude Code auto-loads session-resumption directives in every future session: pilar reads the roadmap, the most recent sprint summary, and any active sprint plan to orient you to current state before any work resumes.
+
+If you need to revise a plan in flight, `/pilar:sprint-amend` captures the delta and re-approves the plan before further work proceeds (§5.2).
 
 ## Requirements
 

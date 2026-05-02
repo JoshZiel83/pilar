@@ -6,7 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
-(no changes yet)
+Phase 4 closed: sprint engine + Primary Collaborator core. Not yet tagged — release tagging is user-gated.
+
+### Added
+
+- `/pilar:sprint-plan` — opens a new sprint by drafting a plan from roadmap state and the prior sprint summary. Sprint-1 special case for briefing has pre-populated objectives. Writes `sprints/sprint-NN/plan.md`, updates roadmap (`current_sprint`, Active Workstreams), proposes commit message inline, waits for user approval. (commands/sprint-plan.md)
+- `/pilar:sprint-close` — closes the active sprint at the §5.3 checkpoint. Drafts the summary from work actually completed, presents at the checkpoint, executes the four-option state machine (Confirm / Request revisions [bounded or substantive] / Defer / Rewind) with branch-specific roadmap updates. Each terminal branch proposes its own commit message inline. (commands/sprint-close.md)
+- `/pilar:sprint-amend` — handles in-flight plan revisions per §5.2 ("an amended plan is proposed by the Primary Collaborator, approved by the user, and committed before further work proceeds"). Captures the delta in an `## Amendments` section appended to the plan. (commands/sprint-amend.md)
+- `/pilar:init` extended to seed the full set of engagement-artifact stubs whose schemas now exist: `briefing.md`, `style-guide.md` (with the §9 disallowed-pattern defaults inherited verbatim from the schema), `lexicon.md`, `knowledge-base/manifest.md`, `registers/evidence-gaps.md`, `registers/aspirational-statements.md` — alongside the existing `roadmap.md` seeding. All seeded stubs validate clean against `scripts/validate-schemas.py`.
+- A static `CLAUDE.md` template dropped at the engagement repo root by `/pilar:init`. Triggers session resumption (§5.4) on every Claude Code session start in the engagement directory: read roadmap → most recent sprint summary → active sprint plan → orient the user briefly → defer to user before offering work. Lists available `/pilar:*` slash commands.
 
 ## [0.1.0] — 2026-05-02
 
