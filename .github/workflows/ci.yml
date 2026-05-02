@@ -10,8 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-# Future jobs, activated as their phase ships (see IMPLEMENTATION_ROADMAP.md):
-#   context-audit    (Phase 5): no QC subagent prompt contains drafting-only inputs
+# All planned CI jobs activated as of P2 closure.
+# Phase 5 will extend context-audit to register Editor and (Phase 8) Strategic
+# Reviewer harnesses with their own allowlists and forbidden-token sets.
 
 jobs:
   required-files:
@@ -81,3 +82,14 @@ jobs:
           python-version: '3.x'
       - name: Validate fixtures against schemas
         run: python3 scripts/validate-schemas.py examples/fixtures/
+
+  context-audit:
+    name: QC subagent context audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Run static context audit
+        run: python3 scripts/context-audit.py
