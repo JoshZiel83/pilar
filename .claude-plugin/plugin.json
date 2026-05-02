@@ -1,0 +1,19 @@
+{
+  "name": "pilar",
+  "description": "Structured collaborator for medical writers building Scientific Communication Platforms",
+  "author": {
+    "name": "Joshua Ziel",
+    "email": "JoshZiel83@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/JoshZiel83/pilar",
+  "repository": "https://github.com/JoshZiel83/pilar",
+  "license": "MIT",
+  "keywords": [
+    "medical-writing",
+    "scientific-communication",
+    "pharma",
+    "biotech",
+    "medcomms",
+    "claude-code-plugin"
+  ]
+}

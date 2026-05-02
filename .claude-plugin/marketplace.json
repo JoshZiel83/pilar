@@ -1,0 +1,17 @@
+{
+  "name": "pilar",
+  "owner": {
+    "name": "Joshua Ziel",
+    "email": "JoshZiel83@users.noreply.github.com"
+  },
+  "description": "pilar plugin — single-plugin self-marketplace",
+  "plugins": [
+    {
+      "name": "pilar",
+      "source": "./",
+      "description": "Structured collaborator for medical writers building Scientific Communication Platforms",
+      "homepage": "https://github.com/JoshZiel83/pilar",
+      "license": "MIT"
+    }
+  ]
+}
