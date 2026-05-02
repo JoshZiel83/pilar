@@ -2,7 +2,7 @@
 
 > A structured collaborator for medical writers building Scientific Communication Platforms — turns a multi-session, multi-sprint engagement into versioned, schema-conformant, audit-able markdown.
 
-**Status:** pre-release · not yet installable · in active development. Currently building Phase 2 (walking skeleton + marketplace install path). See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and current phase.
+**Status:** pre-release · installable shell (P2a) · in active development. The plugin can be installed from a Claude Code session today, but `/pilar:init` is a no-op stub. Real scaffolding behavior arrives with P2b (subagent isolation proof + functioning `/pilar:init`). See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and current phase.
 
 ---
 
@@ -73,9 +73,9 @@ For the full specification of behavior, artifacts, schemas, and interaction cont
 
 ## Installation
 
-> ⚠️ **Pre-release.** The install path below is the *planned* mechanism, available once Phase 2 of the [implementation roadmap](./IMPLEMENTATION_ROADMAP.md) ships. The repo currently contains the spec, roadmap, license, and this README — there is no installable plugin yet. ⭐ the repo to follow progress.
+> ⚠️ **Pre-release (P2a — installable shell).** The plugin installs and registers `/pilar:init`, but the command is a no-op stub. Real scaffolding behavior lands with P2b. ⭐ the repo to follow progress.
 
-Once Phase 2 ships, install from any Claude Code session:
+Install from any Claude Code session:
 
 ```
 /plugin marketplace add JoshZiel83/pilar
@@ -88,7 +88,7 @@ To update later: `/plugin update pilar@pilar`.
 
 ## Quickstart
 
-> Available with Phase 2.
+> Available with Phase 2b. The flow below is the planned UX; today, `/pilar:init` is a no-op stub.
 
 ```
 # In a fresh directory that will become your engagement repo:
@@ -100,7 +100,7 @@ To update later: `/plugin update pilar@pilar`.
                                # presents it for Confirm / Revise / Defer / Rewind
 ```
 
-The `/pilar:init` command scaffolds the directory structure described in §3 of the spec, creates the initial `roadmap.md`, and orients you for the first sprint. Subsequent sessions start with pilar reading the roadmap, the most recent sprint summary, and any active sprint plan to orient you to current state before any work resumes.
+The `/pilar:init` command will scaffold the directory structure described in §3 of the spec, create the initial `roadmap.md`, and orient you for the first sprint. Subsequent sessions will start with pilar reading the roadmap, the most recent sprint summary, and any active sprint plan to orient you to current state before any work resumes.
 
 ## Requirements
 
