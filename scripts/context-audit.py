@@ -53,8 +53,8 @@ REPO = Path(__file__).resolve().parent.parent
 FACT_CHECKER_ALLOWED_VARS: set[str] = {
     "{operating_context}",
     "{artifact_id}",
-    "{artifact_text}",
-    "{source_texts}",
+    "{artifact_path}",
+    "{source_paths}",
 }
 
 FACT_CHECKER_FORBIDDEN_TOKENS: list[str] = [
@@ -132,13 +132,16 @@ def audit_fact_checker_agent(path: Path) -> list[str]:
 
     if tools_line is None:
         errors.append(f"{path}: subagent must declare 'tools' in frontmatter")
-    elif tools_line.replace(" ", "") != "tools:[]":
-        errors.append(
-            f"{path}: subagent must declare 'tools: []' (got: '{tools_line}'); "
-            "an empty tools list is the load-bearing isolation guarantee for "
-            "the P2 stub — no file-system access means the parent's prompt is "
-            "the entire context the subagent can see"
-        )
+    else:
+        normalized = tools_line.replace(" ", "")
+        if normalized not in ("tools:[]", "tools:[Read]"):
+            errors.append(
+                f"{path}: subagent must declare 'tools: []' or 'tools: [Read]' "
+                f"(got: '{tools_line}'); QC subagent isolation requires no "
+                "write/edit/bash/task access — Read is the only permitted tool "
+                "for fetching the artifact + cited sources from paths the parent "
+                "passes in the prompt"
+            )
 
     return errors
 
