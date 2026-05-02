@@ -2,7 +2,7 @@
 
 > A structured collaborator for medical writers building Scientific Communication Platforms — turns a multi-session, multi-sprint engagement into versioned, schema-conformant, audit-able markdown.
 
-**Status:** pre-release · installable shell (P2a) · in active development. The plugin can be installed from a Claude Code session today, but `/pilar:init` is a no-op stub. Real scaffolding behavior arrives with P2b (subagent isolation proof + functioning `/pilar:init`). See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and current phase.
+**Status:** pre-release · walking skeleton complete (Phase 2) · in active development. The plugin installs from a Claude Code session, scaffolds an engagement repo via `/pilar:init`, and demonstrates the §4/§8 QC subagent Independence Contract via a stub Fact-Checker (`/pilar:run-qc`). Schema validation and a static context audit gate every commit in CI. Sprint engine, real QC, and per-pillar workflows arrive with subsequent phases — see [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) for the full plan and current phase.
 
 ---
 
@@ -73,7 +73,7 @@ For the full specification of behavior, artifacts, schemas, and interaction cont
 
 ## Installation
 
-> ⚠️ **Pre-release (P2a — installable shell).** The plugin installs and registers `/pilar:init`, but the command is a no-op stub. Real scaffolding behavior lands with P2b. ⭐ the repo to follow progress.
+> ⚠️ **Pre-release (Phase 2 — walking skeleton).** The plugin installs, scaffolds an engagement repo via `/pilar:init`, and demonstrates the QC subagent Independence Contract via a stub `/pilar:run-qc`. Real QC evaluation, the sprint engine, and per-pillar development workflows arrive with subsequent phases. ⭐ the repo to follow progress.
 
 Install from any Claude Code session:
 
@@ -97,7 +97,7 @@ To update later: `/plugin update pilar@pilar`.
 
 ## Quickstart
 
-> Available with Phase 2b. The flow below is the planned UX; today, `/pilar:init` is a no-op stub.
+> The first command (`/pilar:init`) is functional today and can scaffold a fresh engagement repo. `/pilar:sprint-plan` and `/pilar:sprint-close` ship with Phase 4 (sprint engine).
 
 ```
 # In a fresh directory that will become your engagement repo:
