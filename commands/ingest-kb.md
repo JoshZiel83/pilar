@@ -196,12 +196,62 @@ EOF
 
 If the user wants to revise the message, accept their version. If the user defers the commit, **stop** without committing — the changes remain in the working directory.
 
-### Step 12 — Brief the user on next steps
+### Step 12 — Auto-detect orphan reference statements
 
-Tell the user (substituting `N` and `M` from Step 11):
+After the manifest commit lands, run the orphan-RS predicate to flag reference statements that lack support and propose `GAP-NNN` candidates. For early-sprint engagements with no pillars yet, the scan returns zero orphans and this step is a silent no-op — proceed directly to Step 13.
 
-> ✓ N source(s) ingested. `knowledge-base/manifest.md` now contains M entries; files organized under the approved subfolder taxonomy.
+Run:
+
+!`python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md --format json`
+
+Parse the JSON output. If `orphan_count` is 0, skip the rest of this step and proceed to Step 13. Otherwise, surface the orphans to the user as a brief summary:
+
+> Found N orphan reference statement(s):
+> - P-NN.SS-NN.RS-NN — <reason>
+> - …
+
+For each orphan, draft a candidate `GAP-NNN` entry per `schemas/evidence-gaps.md`:
+
+- `linked_to:` — the orphan's `composite_id`.
+- `description:` — what is missing. Read the RS at the orphan's `pillar_path` for context. Be specific about the claim the RS makes and why current sources don't support it.
+- `evidence_type_needed:` — what kind of evidence would close it (RCT, RWE study, mechanistic data, guideline statement, peer-reviewed publication of an existing readout, etc.). Use the briefing's indication, audience, and strategic priorities for this judgment.
+- `proposed_search:` — a concrete search strategy (PubMed query terms, congress bodies and abstract sessions, KOL contacts, internal medical-affairs queries, planned readouts to monitor, etc.). **This is the field a Python script cannot fill** — the Librarian (you, with full briefing/audience/indication context) drafts it.
+- `status:` `open`
+- `opened:` today's ISO date (computed in Step 7).
+- `closed:` (leave empty for open gaps).
+
+Sequential `GAP-NNN` ids: read existing `registers/evidence-gaps.md`, find the highest `GAP-NNN` across both `## Open Gaps` and `## Closed Gaps` sections (`docs/CONVENTIONS.md` append-only rule), and continue from `max + 1` zero-padded to three digits.
+
+Present all proposed entries as a single block. Wait for explicit user approval. Accept per-field refinements; iterate until satisfied. If the user defers, **stop** without writing the gap entries — tell them they can re-run the scan ad-hoc via `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md` and compose entries manually.
+
+On approval, append the entries under `## Open Gaps` in `registers/evidence-gaps.md`. Use the Edit tool with `old_string` matching the section heading + any existing trailing entry text + the next-section boundary; `new_string` inserts the new entries before the `## Closed Gaps` H2. If the file currently reads `<no open gaps yet>` or similar stub text under `## Open Gaps`, replace that placeholder with the new entries. Update the frontmatter `updated:` field to today's ISO date.
+
+Run:
+
+!`python3 scripts/validate-schemas.py registers/evidence-gaps.md`
+
+If validation fails, surface errors and correct via targeted Edits before continuing.
+
+Display `git status` and propose a separate commit message:
+
+```
+chore(pilar): N evidence gap(s) opened from orphan-RS scan
+
+Auto-detected by scripts/detect-gaps.py after KB ingest. Each
+GAP-NNN links to a reference statement whose sources are missing,
+empty, or cite REF-NNN ids absent from the manifest. Librarian
+drafted proposed_search per orphan from briefing and audience
+context.
+```
+
+Wait for explicit user approval. On approval: `git add registers/evidence-gaps.md` and commit. If deferred, **stop** without committing — the file edits remain in the working tree.
+
+### Step 13 — Brief the user on next steps
+
+Tell the user (substituting `N` ingested sources, `M` total in manifest, and `K` gaps opened from Step 12, where `K` may be zero):
+
+> ✓ N source(s) ingested. `knowledge-base/manifest.md` now contains M entries; files organized under the approved subfolder taxonomy. K evidence gap(s) opened in this run.
 >
-> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` to append them. Once pillars are drafted, run `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md` to flag reference statements lacking support and produce `GAP-NNN` candidates for `registers/evidence-gaps.md`. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
+> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` — incremental ingestion + an orphan-RS scan run automatically. To scan for orphans without ingesting (e.g., after a pillar is updated), run `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md`. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
 
 Stop.
