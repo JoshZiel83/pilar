@@ -18,13 +18,11 @@ Medical writers at medical communications agencies. The plugin assumes scientifi
 
 ## Why it exists
 
-Scientific communication platform development has structural realities that off-the-shelf drafting tools handle poorly:
+Building a Scientific Communication Platform is strategic work at its core. The writer's most important contribution — deciding what matters for a specific client and their product, identifying the evidence that supports it, sequencing the argument — requires sustained thinking that is hard to do when attention is split.
 
-- **Evidence is not fully available at the start.** Reference statements drafted today may need to be revisited as new publications, congress abstracts, or in-flight study readouts arrive. The plugin tracks evidence gaps as first-class artifacts and re-engages when the knowledge base grows.
-- **Strategic priorities are client-specific.** They must be captured before scaffolding is proposed, and the resulting deliverable must be evaluable against them as a whole.
-- **Every meaningful step requires human review.** Sprint plans, pillar drafts, QC reports, consolidated drafts — the writer is the gatekeeper at every checkpoint.
-- **Quality control must be independent.** Fact-checking, editing, and strategic review must not be conditioned on the rationale used to draft the copy under review. The plugin enforces this with isolated subagent contexts.
-- **The deliverable evolves across many sessions.** Project state must be maintained so any session can resume coherently from the prior one.
+But SCP development also carries a heavy logistical load: sifting through publications, tracking what is available versus pending versus in-gap, keeping language consistent across pillars, managing QC sequencing, maintaining continuity across sessions that may be weeks apart. These tasks don't require strategic judgment, but they steadily crowd it out.
+
+pilar exists to absorb that overhead. It is an augmentation tool, not a generation tool. Claude alone would write a poor SCP — and that isn't the point. The point is a writer who can spend their time on the strategy and the why behind what is on the page, rather than on the mechanics of getting it there.
 
 ## How it works
 
