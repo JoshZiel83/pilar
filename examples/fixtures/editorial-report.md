@@ -16,10 +16,6 @@ P-04 (Clinical Evidence) pillar — narrative, SS-01, and its two reference stat
 
 3 edits applied: 2 lexicon (DLBCL on first use, CAR-T orthography), 1 style (replaced one em-dash-as-rhythm with a comma).
 
-## Change Log
-
-_Not applicable in drafting context — human reviewer reviews edited copy fresh._
-
 ## Items Flagged But Not Edited
 
 ### ED-04-001

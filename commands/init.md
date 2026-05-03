@@ -45,6 +45,7 @@ mkdir -p \
   pillars \
   registers \
   explorations \
+  consolidated \
   qc/fact-check-reports \
   qc/editorial-reports \
   qc/strategic-alignment-reports \
@@ -52,7 +53,7 @@ mkdir -p \
 
 for d in \
   knowledge-base/clinical knowledge-base/preclinical knowledge-base/guidelines knowledge-base/competitor knowledge-base/other \
-  pillars registers explorations \
+  pillars registers explorations consolidated \
   qc/fact-check-reports qc/editorial-reports qc/strategic-alignment-reports \
   sprints
 do
@@ -61,6 +62,8 @@ done
 ```
 
 Note on `explorations/`: this directory holds optional per-pillar exploration notes produced by `/pilar:explore` (a P7 refinement). Files in this directory are scratch markdown — not §7 artifacts — and are not validated by `scripts/validate-schemas.py`. The directory is committed (with `.gitkeep`) so future `/pilar:explore` invocations have a stable target path.
+
+Note on `consolidated/`: this directory holds assembled `consolidated/cd-NNN.md` whole-deliverable views produced by `/pilar:consolidate` (P8). Each `cd-NNN` is a `consolidated-draft` artifact (`schemas/consolidated-draft.md`) that the whole-deliverable review (`/pilar:run-qc --consolidated`) operates on. The directory is committed (with `.gitkeep`) so the first `/pilar:consolidate` invocation has a stable target.
 
 ### Step 4 — Intake interview
 

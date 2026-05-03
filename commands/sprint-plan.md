@@ -39,6 +39,14 @@ Do not proceed.
 
 ### Step 4 — Determine sprint scope
 
+Determine which sub-case applies, in this order:
+
+1. **`N == 1`** → briefing sprint (special case — see below).
+2. **Post-handoff client-feedback re-entry** → if `roadmap.md`'s `## Status` body contains the phrase "Engagement complete" (case-insensitive — set by `/pilar:handoff`) AND at least one `consolidated/cd-NNN.md` exists, this is a client-feedback re-entry sprint per §6.9 (special case — see below).
+3. Otherwise → subsequent sprint (default — see below).
+
+Pick the first matching sub-case and use its defaults.
+
 #### If `N == 1` (briefing sprint, special case)
 
 The first sprint is always briefing. Pre-populate the plan with these defaults; refine with the user only if they want to expand:
@@ -53,7 +61,29 @@ The first sprint is always briefing. Pre-populate the plan with these defaults; 
 - **Expected Outputs.** Complete `briefing.md`; `roadmap.md` reflecting briefing-derived state; signed-off Sprint 1 summary (`human_response: confirmed`).
 - **Notes.** Briefing is itself a sprint per §5.3 and exercises the full sprint-end checkpoint pattern before any drafting work begins.
 
-#### If `N > 1` (subsequent sprint)
+#### If post-handoff state is detected (client-feedback re-entry, special case)
+
+Triggered when the engagement was previously handed off via `/pilar:handoff` and the user is now opening a sprint to address client feedback on the delivered consolidated draft. Per §6.9: "Client feedback intake resumes Claude Code involvement: a new sprint is planned to address the feedback, typically reopening affected pillars, revising statements, re-consolidating the deliverable, and re-running whole-deliverable QC."
+
+Capture the most recent consolidated draft id (e.g. `cd-001`) by listing `consolidated/cd-*.md | sort | tail -1` and parsing the `cd-NNN`. The next consolidated draft will be `cd-<NNN+1>`.
+
+Conduct a short interactive prompt with the user to capture the **affected pillars** (the pillars the client's feedback reopens). Pre-populate the plan with these defaults, with `<affected-pillars>` substituted from the user's response and `<cd-id>` / `<cd-next>` substituted from the discovered ids:
+
+- **Objectives.**
+  1. Address client feedback on consolidated draft `<cd-id>` per the writer's intake of the client's response.
+  2. Reopen the affected pillars (`<affected-pillars>`) and revise scientific and reference statements per the feedback.
+  3. Assemble a new consolidated draft `<cd-next>` from the revised pillar set.
+  4. Re-run the whole-deliverable review on `<cd-next>` (Editor → Fact-Checker → Strategic Reviewer, all read-only per §6.8 — findings are addressed by editing source pillars and re-consolidating).
+- **Artifacts to Create or Modify.** Per affected pillar: `pillars/<pillar-id>-<slug>.md`. New consolidated draft: `consolidated/<cd-next>.md`. New WDR reports: `qc/editorial-reports/sprint-<NN>-editorial-<cd-next>.md`, `qc/fact-check-reports/sprint-<NN>-fact-check-<cd-next>.md`, `qc/strategic-alignment-reports/sprint-<NN>-strategic-<cd-next>.md`.
+- **QC Roles to Run.**
+  - **Per affected pillar at drafting context:** Editor + Fact-Checker via `/pilar:run-qc <pillar-path>` after revisions.
+  - **At consolidated context:** Editor + Fact-Checker + Strategic Reviewer via `/pilar:run-qc --consolidated consolidated/<cd-next>.md`.
+- **Expected Outputs.** Affected pillars at `status: statements-approved` with revisions reflecting the client feedback; `consolidated/<cd-next>.md` assembled and validated; cleared whole-deliverable review for `<cd-next>` (no unresolved high-severity findings); signed-off sprint summary (`human_response: confirmed`).
+- **Notes.** Per §6.9 this sprint follows the standard sprint-end checkpoint pattern (§5.3). After WDR clears on `<cd-next>`, run `/pilar:handoff` to update the roadmap and propose a new engagement handoff tag — the new tag's name will incorporate `<cd-next>` rather than `<cd-id>`. Subsequent client rounds repeat this pattern, each producing a higher `cd-NNN` and a corresponding handoff tag.
+
+Refine the plan with the user as needed (additional objectives, removed scope, more or fewer affected pillars, etc.) before proceeding to Step 5.
+
+#### If `N > 1` (subsequent sprint, default)
 
 Derive scope from these inputs in order of priority:
 

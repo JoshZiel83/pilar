@@ -77,9 +77,11 @@ Operates independently of the Primary Collaborator. Verifies each reference stat
 
 ### 4.4 Editor
 
-Operates independently of the Primary Collaborator. Edits copy for style and lexicon within the constraint of preserving meaning. Permitted edits include swapping terms to lexicon-preferred forms, restructuring sentences to comply with the style guide, removing disallowed rhythmic and stylistic patterns characteristic of LLM output, harmonizing terminology across pillars at the consolidated stage, and tightening construction. Prohibited from changing factual claims, evidence linkages, source attributions, scientific argument structure, scientifically-weighted hedging that reflects evidence uncertainty, and the strategic argument of any scientific statement. Where applying a style or lexicon edit would require changing meaning, the Editor refrains from editing and flags the item for the human reviewer.
+Operates independently of the Primary Collaborator. The Editor's behavior depends on the operating context.
 
-The Editor runs before human review at all drafting checkpoints. At drafting checkpoints, the Editor produces edited copy and a list of items flagged but not edited. A detailed change log is not required at this stage because the human reviewer is reviewing the copy fresh. At consolidated-draft checkpoints, where the copy under review has already passed human review at the pillar level, the Editor additionally produces a structured change log so its edits to previously-approved content are inspectable.
+At drafting checkpoints (per-pillar narrative, scientific statement, reference statement) the Editor edits copy for style and lexicon within the constraint of preserving meaning. Permitted edits include swapping terms to lexicon-preferred forms, restructuring sentences to comply with the style guide, removing disallowed rhythmic and stylistic patterns characteristic of LLM output, and tightening construction. Prohibited from changing factual claims, evidence linkages, source attributions, scientific argument structure, scientifically-weighted hedging that reflects evidence uncertainty, and the strategic argument of any scientific statement. Where applying a style or lexicon edit would require changing meaning, the Editor refrains from editing and flags the item for the human reviewer. The Editor produces edited copy and a list of items flagged but not edited; a detailed change log is not required at this stage because the human reviewer is reviewing the copy fresh.
+
+At consolidated-draft checkpoints the Editor reads the consolidated draft and reports findings; it does not edit. Findings include cross-pillar terminology drift, lexicon adherence drift across pillars, claim duplication or contradiction across pillars, and any consistency observation that cuts across pillar boundaries. The Editor produces a list of flagged items only; it does not produce a change log because no changes are applied. Findings are addressed by the writer editing the source pillars and re-consolidating; the consolidated draft itself is a deterministic assembly of the source pillars and is not edited directly. This preserves the source pillars as the canonical state of the engagement and prevents the consolidated draft from drifting from the pillars across re-consolidation cycles.
 
 ### 4.5 Strategic Reviewer
 
@@ -166,19 +168,21 @@ If the client has supplied a lexicon and style guide, they are loaded during bri
 
 ### 6.7 Consolidation
 
-The Primary Collaborator assembles the platform package into a consolidated draft. The consolidated draft brings the briefing, the pillar set with their narratives and statements, the lexicon, and the style guide into a single coherent deliverable view. Consolidation may occur more than once during the engagement: an initial consolidated draft is produced at the close of per-pillar development, and additional consolidated drafts are produced after client feedback rounds.
+The platform package is assembled into a consolidated draft by deterministic mechanical concatenation of the source artifacts: the briefing, the pillar set with their narratives and statements, the lexicon, and the style guide. Consolidation does not interpret, rewrite, or summarize; it produces a single coherent deliverable view that is byte-determined by the inputs. The consolidated draft is therefore a derived artifact, not an authored one, and the source pillars remain the canonical state of the engagement.
+
+Consolidation may occur more than once during the engagement: an initial consolidated draft is produced at the close of per-pillar development, and additional consolidated drafts are produced after client feedback rounds or after whole-deliverable review surfaces findings that require pillar revision.
 
 ### 6.8 Whole-Deliverable Review
 
-Every consolidated draft is subjected to a whole-deliverable review before it is considered ready for client delivery or for sign-off. The QC roles operate independently of the Primary Collaborator.
+Every consolidated draft is subjected to a whole-deliverable review before it is considered ready for client delivery or for sign-off. The QC roles operate independently of the Primary Collaborator. All three roles are read-only at this stage: they report findings against the consolidated draft and do not modify it. Because consolidation is deterministic (§6.7), all corrective edits land in the source pillars (or other source artifacts) and are propagated to the deliverable by the next consolidation. This preserves the source pillars as the canonical state of the engagement.
 
-The Editor edits the consolidated draft for consistency and lexicon adherence within the meaning-preserving constraint. Editorial scope at this stage includes terminology consistency, narrative cohesion across pillars, claim duplication or contradiction, internal consistency within each pillar at the level of the consolidated artifact, and lexicon adherence across the deliverable, including drift in preferred terms across pillars and any new terms introduced during pillar development. The Editor produces a structured change log at this stage so its edits to previously-approved content are inspectable. Items where an edit would change meaning are flagged rather than edited. The Editor's edits at the consolidated stage are committed in a discrete commit so the diff is available.
+The Editor reads the consolidated draft and reports cross-pillar findings: terminology consistency, narrative cohesion across pillars, claim duplication or contradiction, internal consistency within each pillar at the level of the consolidated artifact, and lexicon adherence across the deliverable, including drift in preferred terms across pillars and any new terms introduced during pillar development. The Editor produces a list of flagged items only; it does not produce a change log because no changes are applied at this stage.
 
-The Fact-Checker runs on the edited consolidated draft and produces its report.
+The Fact-Checker runs on the consolidated draft and produces its report.
 
-The Strategic Reviewer reads the briefing, the roadmap, and the edited consolidated draft. It evaluates whether the consolidated draft reflects the strategic priorities captured in the briefing, whether each pillar advances those priorities, whether the balance of emphasis is appropriate to the client's strategic intent, and whether any priority is unaddressed or under-addressed. It produces the strategic alignment report.
+The Strategic Reviewer reads the briefing, the roadmap, and the consolidated draft. It evaluates whether the consolidated draft reflects the strategic priorities captured in the briefing, whether each pillar advances those priorities, whether the balance of emphasis is appropriate to the client's strategic intent, and whether any priority is unaddressed or under-addressed. It produces the strategic alignment report.
 
-The edited consolidated draft, the editorial change log with flagged items, the fact-check report, and the strategic alignment report are presented to the user. The Primary Collaborator addresses findings in collaboration with the user. Where findings require substantive revision, the affected pillars are reopened, revised, and the deliverable is re-consolidated. The whole-deliverable review is then re-run on the new consolidated draft. This loop continues until the consolidated draft clears review.
+The three reports (editorial flagged items, fact-check, strategic alignment) are presented to the user. The Primary Collaborator addresses findings in collaboration with the user. Findings are resolved by editing the affected source artifacts — typically the affected pillars — and re-consolidating the deliverable. The whole-deliverable review is then re-run on the new consolidated draft. This loop continues until the consolidated draft clears review.
 
 ### 6.9 Handoff
 
@@ -513,20 +517,10 @@ created: <iso-date>
 # Editorial Report
 
 ## Scope
-<what was edited>
+<what was reviewed>
 
 ## Edits Applied Summary
-<count and category breakdown of edits applied>
-
-## Change Log
-<required at consolidated-draft context; omitted at drafting context>
-
-### <change-id>
-- target: <pillar-id, pillar-id.ss-id, or pillar-id.ss-id.rs-id>
-- category: <tone|lexicon|style|consistency|cross-pillar>
-- before: <text>
-- after: <text>
-- rationale: <text>
+<at drafting context: count and category breakdown of edits applied. At consolidated-draft context: "0 edits applied (read-only review per §6.8)." since the Editor does not edit the consolidated draft.>
 
 ## Items Flagged But Not Edited
 
@@ -535,7 +529,7 @@ created: <iso-date>
 - category: <tone|lexicon|style|consistency|cross-pillar>
 - issue: <description>
 - proposed_change: <what would resolve it>
-- reason_not_edited: <why this would change meaning>
+- reason_not_edited: <at drafting context: why this would change meaning. At consolidated-draft context: "n/a — Editor is read-only at consolidated stage; addressed by editing source pillars per §6.8.">
 - severity: <high|medium|low>
 ```
 
@@ -567,9 +561,9 @@ QC roles run as specified by the sprint plan and on demand. The plan identifies 
 
 The Fact-Checker reads only the artifacts under review and the cited source files. It does not read the briefing, the roadmap, or any drafting context that might bias its evaluation. It evaluates whether each reference statement is supported by the sources cited, whether the source strength is appropriate to the claim, and whether scientific statements are supportable as syntheses of their reference statements.
 
-The Editor reads the artifacts under review, the lexicon, and the style guide. It does not read the drafting rationale. The Editor edits copy for style and lexicon within the constraint of preserving meaning, evidence linkages, source attributions, scientific argument structure, and scientifically-weighted hedging. Where an edit would change meaning, the Editor flags the item rather than editing it. At drafting checkpoints the Editor produces edited copy and a list of flagged items. At consolidated-draft checkpoints the Editor additionally produces a structured change log and the edits are committed in a discrete commit.
+The Editor reads the artifacts under review, the lexicon, and the style guide. It does not read the drafting rationale. At drafting checkpoints the Editor edits copy for style and lexicon within the constraint of preserving meaning, evidence linkages, source attributions, scientific argument structure, and scientifically-weighted hedging; where an edit would change meaning, the Editor flags the item rather than editing it. At consolidated-draft checkpoints the Editor is read-only: it reports cross-pillar findings (terminology drift, lexicon adherence, claim duplication or contradiction, internal consistency at the consolidated level) but does not edit the consolidated draft. Findings at consolidated-draft checkpoints are addressed by editing the source pillars and re-consolidating per §6.7 and §6.8.
 
-The Editor runs before the Fact-Checker so that the Fact-Checker reviews the edited copy. This sequencing also serves as a safety net: if an edit subtly altered a factual claim despite the editor's constraints, the Fact-Checker is positioned to catch it.
+The Editor runs before the Fact-Checker so that at drafting checkpoints the Fact-Checker reviews the edited copy; this sequencing also serves as a safety net for drafting-context edits. At consolidated-draft checkpoints the sequencing is preserved (Editor first, then Fact-Checker, then Strategic Reviewer) as a matter of report-ordering convention rather than dependency, since the Editor's read-only consolidated pass does not modify the artifact.
 
 The Strategic Reviewer reads the briefing, the roadmap, and the edited consolidated draft. It does not read the drafting rationale. It evaluates whether the consolidated draft reflects the strategic priorities captured in the briefing, whether each pillar advances those priorities, whether the balance of emphasis is appropriate to the client's strategic intent, and whether any priority is unaddressed or under-addressed.
 

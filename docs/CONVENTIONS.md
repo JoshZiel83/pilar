@@ -13,7 +13,6 @@
 | Evidence-gap entry | `gap-id` | `GAP-NNN` | evidence-gaps file | `GAP-001` |
 | Aspirational statement | `asp-id` | `ASP-NNN` | aspirational-statements file | `ASP-001` |
 | Fact-check finding | `finding-id` | `FC-<sprint>-NNN` | fact-check-report file | `FC-04-001` |
-| Editorial change-log entry | `change-id` | `CL-NNN` | editorial-report file (consolidated-draft context only) | `CL-001` |
 | Editorial flagged item | `finding-id` | `ED-<sprint>-NNN` | editorial-report file | `ED-04-001` |
 | Strategic-alignment finding | `finding-id` | `SA-<draft-tag>-NNN` | strategic-alignment-report file | `SA-CD1-001` |
 
