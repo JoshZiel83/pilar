@@ -116,6 +116,41 @@ QC_HARNESSES: list[dict] = [
         # is also still permitted but no longer used by the harness.
         "allowed_tools_sets": [{"Read"}, {"Read", "Edit"}],
     },
+    {
+        "name": "strategic-reviewer",
+        "agent_path": "agents/strategic-reviewer.md",
+        "sentinel_open": "<<<PILAR_STRATEGIC_REVIEWER_PROMPT",
+        "sentinel_close": "PILAR_STRATEGIC_REVIEWER_PROMPT>>>",
+        "allowed_vars": {
+            "{operating_context}",
+            "{draft_id}",
+            "{briefing_path}",
+            "{roadmap_path}",
+            "{artifact_path}",
+        },
+        "forbidden_tokens": [
+            "drafting rationale",
+            "sprint summary",
+            "sprint-summary",
+            "primary collaborator",
+            "kb manifest",
+            "kb-manifest",
+            "source file",
+            "source files",
+            "lexicon path",
+            "style guide",
+            "style-guide",
+            "fact-check report",
+            "fact-checker report",
+            "editorial report",
+            "per-pillar progress",
+            "progress notes",
+        ],
+        # Strategic Reviewer reads briefing + roadmap + edited consolidated
+        # draft. Reports findings; never edits. Read-only is the only
+        # permissible tools declaration.
+        "allowed_tools_sets": [{"Read"}],
+    },
 ]
 
 

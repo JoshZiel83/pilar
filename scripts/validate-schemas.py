@@ -44,8 +44,17 @@ ID_PATTERNS: dict[str, str] = {
     "asp": r"^ASP-\d{3}$",
     "fc": r"^FC-\d+-\d{3}$",
     "ed": r"^ED-\d+-\d{3}$",
-    "cl": r"^CL-\d{3}$",
     "sa": r"^SA-[A-Z0-9-]+-\d{3}$",
+    "cd": r"^cd-\d{3}$",
+}
+
+# Frontmatter values that must match an ID_PATTERNS regex. Maps
+# (artifact, frontmatter-key) -> ID_PATTERNS key. Used to enforce
+# foreign-key well-formedness on cross-artifact references that live
+# in frontmatter rather than the body (e.g. SA report → consolidated draft).
+FRONTMATTER_ID_RULES: dict[tuple[str, str], str] = {
+    ("consolidated-draft", "draft_id"): "cd",
+    ("strategic-alignment-report", "consolidated_draft"): "cd",
 }
 
 COMPOSITE_REF = re.compile(
@@ -78,7 +87,6 @@ ID_RULES: dict[str, list[dict]] = {
         {"section": "Findings", "level": 3, "pattern": "fc", "scope": "file"},
     ],
     "editorial-report": [
-        {"section": "Change Log", "level": 3, "pattern": "cl", "scope": "file"},
         {"section": "Items Flagged But Not Edited", "level": 3, "pattern": "ed", "scope": "file"},
     ],
     "strategic-alignment-report": [
@@ -290,6 +298,18 @@ def validate(target: Path, schema_dir: Path) -> list[str]:
         elif is_placeholder(fm[key]):
             errors.append(
                 f"{target}: frontmatter key '{key}' still has placeholder value '{fm[key]}'"
+            )
+
+    for (rule_artifact, rule_key), pattern_key in FRONTMATTER_ID_RULES.items():
+        if rule_artifact != artifact:
+            continue
+        value = fm.get(rule_key)
+        if value is None or is_placeholder(value):
+            continue
+        if not re.match(ID_PATTERNS[pattern_key], value):
+            errors.append(
+                f"{target}: frontmatter '{rule_key}' value '{value}' does not "
+                f"match {pattern_key.upper()} pattern {ID_PATTERNS[pattern_key]}"
             )
 
     schema_headings = set(extract_h2_headings(schema_body))
