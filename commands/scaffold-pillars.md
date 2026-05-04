@@ -138,7 +138,7 @@ Use the Edit tool with `old_string` matching the existing `## Pillars` section a
 
 Run:
 
-!`python3 scripts/validate-schemas.py pillars/ roadmap.md`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py pillars/ roadmap.md`
 
 Note: `scripts/validate-schemas.py`'s directory mode globs `*.md` at the top level only — `pillars/` works because pillar files are flat.
 

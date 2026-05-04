@@ -154,7 +154,7 @@ Body: `# Knowledge Base Manifest` H1, `## Entries` H2, then every approved `### 
 
 Run:
 
-!`python3 scripts/validate-schemas.py knowledge-base/manifest.md`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py knowledge-base/manifest.md`
 
 If validation fails, surface the errors to the user. Correct the manifest with targeted Edits and re-validate. Do not proceed to Step 11 until validation passes.
 
@@ -202,7 +202,7 @@ After the manifest commit lands, run the orphan-RS predicate to flag reference s
 
 Run:
 
-!`python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md --format json`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py pillars knowledge-base/manifest.md --format json`
 
 Parse the JSON output. If `orphan_count` is 0, skip the rest of this step and proceed to Step 13. Otherwise, surface the orphans to the user as a brief summary:
 
@@ -222,13 +222,13 @@ For each orphan, draft a candidate `GAP-NNN` entry per `schemas/evidence-gaps.md
 
 Sequential `GAP-NNN` ids: read existing `registers/evidence-gaps.md`, find the highest `GAP-NNN` across both `## Open Gaps` and `## Closed Gaps` sections (`docs/CONVENTIONS.md` append-only rule), and continue from `max + 1` zero-padded to three digits.
 
-Present all proposed entries as a single block. Wait for explicit user approval. Accept per-field refinements; iterate until satisfied. If the user defers, **stop** without writing the gap entries — tell them they can re-run the scan ad-hoc via `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md` and compose entries manually.
+Present all proposed entries as a single block. Wait for explicit user approval. Accept per-field refinements; iterate until satisfied. If the user defers, **stop** without writing the gap entries — tell them the same orphans will resurface the next time `/pilar:ingest-kb` runs against new files, or during `/pilar:pillar-statements` (which runs the orphan scan automatically after drafting).
 
 On approval, append the entries under `## Open Gaps` in `registers/evidence-gaps.md`. Use the Edit tool with `old_string` matching the section heading + any existing trailing entry text + the next-section boundary; `new_string` inserts the new entries before the `## Closed Gaps` H2. If the file currently reads `<no open gaps yet>` or similar stub text under `## Open Gaps`, replace that placeholder with the new entries. Update the frontmatter `updated:` field to today's ISO date.
 
 Run:
 
-!`python3 scripts/validate-schemas.py registers/evidence-gaps.md`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`
 
 If validation fails, surface errors and correct via targeted Edits before continuing.
 
@@ -252,6 +252,6 @@ Tell the user (substituting `N` ingested sources, `M` total in manifest, and `K`
 
 > ✓ N source(s) ingested. `knowledge-base/manifest.md` now contains M entries; files organized under the approved subfolder taxonomy. K evidence gap(s) opened in this run.
 >
-> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` — incremental ingestion + an orphan-RS scan run automatically. To scan for orphans without ingesting (e.g., after a pillar is updated), run `python3 scripts/detect-gaps.py pillars knowledge-base/manifest.md`. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
+> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` — incremental ingestion + an orphan-RS scan run automatically. After a pillar is drafted or updated, the orphan scan also runs inside `/pilar:pillar-statements` (Step 8) — so day-to-day orphan detection is built into the drafting workflow. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
 
 Stop.

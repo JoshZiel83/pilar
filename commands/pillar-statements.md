@@ -6,7 +6,7 @@ argument-hint: <pillar-id>
 
 Draft the `## Scientific Statements` section of one pillar (per §7.5 / §6.5): SS-NN entries (each with `status`, dates, statement paragraph, strategic argument) and the nested RS-NN entries under each SS (each with `status`, `sources: [REF-NNN, …]`, dates, free-text reference statement). Refuses unless the pillar is at `narrative-approved` (or higher, for additive runs). Iterates with the user one SS at a time. Each RS picks sources from `knowledge-base/manifest.md` REF entries the writer chooses from. Append-only IDs per `docs/CONVENTIONS.md` (highest existing + 1; never reuses retired ids — relevant on rewind).
 
-After drafting, runs `python3 scripts/detect-gaps.py` against the pillar to flag orphan RS — those whose sources are missing, empty, or cite REFs not in the manifest. Surfaces orphans for inline `GAP-NNN` drafting (mirroring `/pilar:ingest-kb` Step 12) or defers to a follow-up `/pilar:ingest-kb` invocation.
+After drafting, runs `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py` against the pillar to flag orphan RS — those whose sources are missing, empty, or cite REFs not in the manifest. Surfaces orphans for inline `GAP-NNN` drafting (mirroring `/pilar:ingest-kb` Step 12) or defers to a follow-up `/pilar:ingest-kb` invocation.
 
 Asks at the end whether to mark the pillar's `status` as `statements-approved`. Proposes the commit and waits for explicit user approval before committing — per decision #4.
 
@@ -94,7 +94,7 @@ Edit the pillar's frontmatter `updated:` field to today's ISO date.
 
 Run:
 
-!`python3 scripts/validate-schemas.py <pillar_path>`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>`
 
 The validator enforces SS-NN / RS-NN format, uniqueness within scope (no duplicate SS-NN within the pillar; no duplicate RS-NN within an SS), and `sources: [REF-NNN, …]` format. If validation fails, surface errors and correct via Edits before continuing.
 
@@ -102,7 +102,7 @@ The validator enforces SS-NN / RS-NN format, uniqueness within scope (no duplica
 
 Run:
 
-!`python3 scripts/detect-gaps.py <pillar_path> knowledge-base/manifest.md --format json`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py <pillar_path> knowledge-base/manifest.md --format json`
 
 Parse the JSON. If `orphan_count` is 0, proceed silently to Step 9.
 
@@ -112,8 +112,8 @@ Compute next `GAP-NNN` from `registers/evidence-gaps.md` (highest existing + 1 z
 
 Ask the user: *"Append these gap entries inline (commit alongside the pillar) or defer to a follow-up `/pilar:ingest-kb` (which will re-detect them)?"*
 
-- **Inline** → Edit `registers/evidence-gaps.md` to append the gaps under `## Open Gaps`. Update its frontmatter `updated:`. Validate via `python3 scripts/validate-schemas.py registers/evidence-gaps.md`.
-- **Defer** → leave `registers/evidence-gaps.md` untouched; the user will run `/pilar:ingest-kb` later to surface the orphans (or re-run `detect-gaps.py` ad-hoc).
+- **Inline** → Edit `registers/evidence-gaps.md` to append the gaps under `## Open Gaps`. Update its frontmatter `updated:`. Validate via !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`.
+- **Defer** → leave `registers/evidence-gaps.md` untouched; the orphans will resurface the next time `/pilar:ingest-kb` runs against new files or the next time this pillar (or another) is drafted via `/pilar:pillar-statements`.
 
 ### Step 9 — Lexicon prompt (§6.6)
 

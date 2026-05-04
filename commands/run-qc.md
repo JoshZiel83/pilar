@@ -114,7 +114,7 @@ Compute the report filename: `qc/editorial-reports/sprint-<NN>-editorial-<slug>.
 
 Write `editorial_report_content` to that path.
 
-Validate it: `!python3 scripts/validate-schemas.py qc/editorial-reports/sprint-<NN>-editorial-<slug>.md`. If validation fails, surface the errors but continue (the report is still useful as content).
+Validate it: `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py qc/editorial-reports/sprint-<NN>-editorial-<slug>.md`. If validation fails, surface the errors but continue (the report is still useful as content).
 
 ### Step 6 — Resolve cited source paths
 
@@ -153,7 +153,7 @@ Substitutions:
 
 ### Step 8 — Save the fact-check report
 
-Save the Fact-Checker's returned report to `qc/fact-check-reports/sprint-<NN>-fact-check-<slug>.md`. Validate with `!python3 scripts/validate-schemas.py qc/fact-check-reports/sprint-<NN>-fact-check-<slug>.md`.
+Save the Fact-Checker's returned report to `qc/fact-check-reports/sprint-<NN>-fact-check-<slug>.md`. Validate with `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py qc/fact-check-reports/sprint-<NN>-fact-check-<slug>.md`.
 
 If `run_strategic_reviewer == false`, **skip ahead to Step 10** (surface and stop). Otherwise proceed to Step 9.
 
@@ -190,7 +190,7 @@ Substitutions:
 
 The variables `{operating_context}`, `{draft_id}`, `{artifact_path}`, `{briefing_path}`, and `{roadmap_path}` are the **complete and exhaustive** set of inputs the parent is permitted to pass into the Strategic Reviewer's context. The static context-audit test in `scripts/context-audit.py` enforces this allowlist.
 
-Save the Strategic Reviewer's returned report to `qc/strategic-alignment-reports/sprint-<NN>-strategic-<draft-id>.md` (e.g. `qc/strategic-alignment-reports/sprint-08-strategic-cd-001.md`). Validate with `!python3 scripts/validate-schemas.py qc/strategic-alignment-reports/sprint-<NN>-strategic-<draft-id>.md`. If validation fails, surface the errors but continue (the report content is still useful).
+Save the Strategic Reviewer's returned report to `qc/strategic-alignment-reports/sprint-<NN>-strategic-<draft-id>.md` (e.g. `qc/strategic-alignment-reports/sprint-08-strategic-cd-001.md`). Validate with `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py qc/strategic-alignment-reports/sprint-<NN>-strategic-<draft-id>.md`. If validation fails, surface the errors but continue (the report content is still useful).
 
 ### Step 10 — Surface the reports
 
