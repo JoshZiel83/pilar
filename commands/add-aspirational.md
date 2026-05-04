@@ -122,7 +122,7 @@ Insert the new entry under the `# Aspirational Statements` H1:
 
 Run:
 
-!`python3 scripts/validate-schemas.py registers/aspirational-statements.md`
+!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/aspirational-statements.md`
 
 If validation fails, surface errors and correct via Edits. Do not proceed until validation passes.
 

@@ -81,7 +81,7 @@ Capture today's ISO date with `!date +%F`. The same date is used as `created:` a
 
 ### Step 5 — Write the engagement-artifact stubs
 
-For every file below, populate frontmatter from the intake answers + today's date, keep every H2 heading from the schema, and replace `<placeholder>` body text with `_TBD — to be filled during Sprint 1 (briefing)._` unless otherwise noted. The result is a set of empty-but-valid documents that pass `python3 scripts/validate-schemas.py` immediately.
+For every file below, populate frontmatter from the intake answers + today's date, keep every H2 heading from the schema, and replace `<placeholder>` body text with `_TBD — to be filled during Sprint 1 (briefing)._` unless otherwise noted. The result is a set of empty-but-valid documents that pass `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py` immediately.
 
 #### 5a — `roadmap.md` (engagement repo root)
 

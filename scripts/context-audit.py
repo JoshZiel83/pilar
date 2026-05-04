@@ -26,6 +26,13 @@ For agents/<role>.md:
     parent passes paths (not inlined content) for the artifact + the
     role-specific permitted resources, and the subagent reads them.
 
+In addition (issue #10):
+
+For every commands/*.md file:
+  - Any `python3 scripts/<x>.py` invocation must be prefixed with
+    ${CLAUDE_PLUGIN_ROOT}/. Engagement repos do not contain scripts/, so
+    bare relative paths fail with FileNotFoundError at runtime.
+
 What this audit does NOT check
 ------------------------------
 
@@ -271,6 +278,31 @@ def audit_subagent_frontmatter(path: Path, harness: dict) -> list[str]:
     return errors
 
 
+# -- Slash-command script-path audit ------------------------------------
+# Engagement-runtime slash commands invoke the plugin's runtime scripts
+# (validate-schemas.py, detect-gaps.py, consolidate.py). These must use
+# ${CLAUDE_PLUGIN_ROOT}/scripts/<x>.py — the bare `scripts/<x>.py` form
+# resolves against the engagement repo's working directory, where the
+# scripts do not exist. Closing issue #10 hinges on this convention; this
+# audit prevents regression.
+
+PYTHON3_SCRIPTS_RE = re.compile(r"python3\s+scripts/")
+
+
+def audit_command_script_paths() -> list[str]:
+    errors: list[str] = []
+    for path in sorted((REPO / "commands").glob("*.md")):
+        for lineno, line in enumerate(path.read_text().splitlines(), start=1):
+            if PYTHON3_SCRIPTS_RE.search(line):
+                errors.append(
+                    f"{path.relative_to(REPO)}:{lineno}: `python3 scripts/...` "
+                    f"must be `python3 ${{CLAUDE_PLUGIN_ROOT}}/scripts/...` — "
+                    "engagement repos do not contain scripts/ (issue #10). "
+                    f"Line: {line.strip()}"
+                )
+    return errors
+
+
 def main() -> int:
     run_qc_path = REPO / "commands" / "run-qc.md"
     if not run_qc_path.exists():
@@ -284,6 +316,8 @@ def main() -> int:
         errors.extend(
             audit_subagent_frontmatter(REPO / harness["agent_path"], harness)
         )
+
+    errors.extend(audit_command_script_paths())
 
     for e in errors:
         print(f"::error::{e}")
