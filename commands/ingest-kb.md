@@ -68,9 +68,14 @@ Capture the file list as `kb_files` (relative paths to engagement repo root).
 - `competitor/` — clinical or strategic data on competitor products
 - `other/` — anything that does not fit the above (reviews, congress abstracts, regulatory docs, etc.)
 
+Plus a staging subfolder, `knowledge-base/for_ingestion/`, where `/pilar:research` writes provisional sources and writers may drop new files manually. **`for_ingestion/` is a queue, not a destination** — every file in it must be moved to one of the taxonomy subfolders during this command. After this run, `for_ingestion/` ends empty (only `.gitkeep` remains).
+
 **In incremental mode**, the existing manifest may also reveal user-introduced subfolders (any `file:` path whose subfolder is not one of the five defaults). Treat those as additional valid taxonomy slots — the engagement's lived taxonomy is the union of the defaults and whatever the manifest already uses.
 
-For each file in `kb_files`, propose an assignment using filename hints (`alr217`, `pivotal`, `phase` → `clinical/`; `nccn`, `guideline` → `guidelines/`; competitor product names → `competitor/`; etc.) plus, if the file is text-readable (`.md`, `.txt`), a brief glance at the first ~30 lines for clarifying hints. Files already correctly placed under a subfolder receive that subfolder as the proposal (no-op move).
+For each file in `kb_files`, partition by **provisional** vs **non-provisional**:
+
+- **Provisional file** — the file's frontmatter contains `provisional: true` and `source: pubmed` or `source: clinicaltrials.gov` (written by `/pilar:research` via `scripts/research-fetch.py`). For these, propose the taxonomy using the structured metadata: PubMed entries with a clinical-trial `publication_type` or trial-related MeSH terms → `clinical/`; PubMed entries on mechanism/preclinical biology → `preclinical/`; guidelines → `guidelines/`; CT.gov registrations whose `lead_sponsor` matches the engagement's product owner → `clinical/`, otherwise → `competitor/`. Files in `for_ingestion/` must move to a taxonomy subfolder (they cannot stay in the staging dir).
+- **Non-provisional file** — propose using filename hints (`alr217`, `pivotal`, `phase` → `clinical/`; `nccn`, `guideline` → `guidelines/`; competitor product names → `competitor/`; etc.) plus, if the file is text-readable (`.md`, `.txt`), a brief glance at the first ~30 lines for clarifying hints. Files already correctly placed under a subfolder receive that subfolder as the proposal (no-op move).
 
 Present the assignments to the user as a table or tree, e.g.:
 
@@ -117,7 +122,21 @@ Capture today's ISO date with `!date +%F` for the `ingested:` field.
 
 For each file, propose a `### REF-NNN` entry using sequential numbering starting at `next_ref_n` (computed in Step 2 — `REF-001` in initial mode; the next-after-highest-existing in incremental mode, honoring `docs/CONVENTIONS.md`'s append-only rule). Order is the user's call — propose by subfolder (clinical first, then preclinical, etc.) for readable ordering.
 
-Each entry needs the seven §7.4 fields:
+**Provisional files** (frontmatter `provisional: true`, written by `/pilar:research`): pre-populate the entry from the file's frontmatter; do not invent any field. Mapping:
+
+- `file:` — post-move path.
+- `citation:` — for PubMed: the full Vancouver citation rendered from the frontmatter's title, authors, journal, year, volume, issue, pages. For CT.gov: `<brief_title>. ClinicalTrials.gov Identifier: NCT<id>. Status as of <fetched>: <overall_status>.`
+- `type:` — for PubMed: map `publication_type` to one of the standard types (e.g. "Randomized Controlled Trial" → `RCT`; "Clinical Trial, Phase II" → `single-arm trial` or `RCT` per design). For CT.gov: `clinicaltrials-registration` (a literal). When ambiguous, propose `pubmed-abstract` (a literal) and let the user refine.
+- `design:` — for PubMed: synthesize one short phrase from `publication_type` + key MeSH terms. For CT.gov: `<phase>; <study_type>; planned enrollment <enrollment>`.
+- `population:` — for PubMed: extract from MeSH if present (e.g. an MeSH like "Aged" → "elderly"); otherwise leave the value as `_TBD — extract from full text when acquired._`. For CT.gov: extract from eligibility (age range + condition list).
+- `key_findings:` — **always ask the user** even for provisional files. This is the editorial summary — the no-LLM-in-canonical-content principle does not extend to extraction-from-the-abstract because the user must judge what is load-bearing for the engagement. Surface the abstract verbatim alongside the prompt to help the writer answer concisely.
+- `tags:` — for PubMed: subset of `mesh_terms` rendered as kebab-case slugs (cap at ~5). For CT.gov: `conditions` + `interventions` rendered the same way.
+- `status: provisional` — added to the entry; flags this REF as metadata-only awaiting full-text upgrade.
+- `ingested:` — today's ISO date.
+
+Pre-populated provisional entries are surfaced as a single block; the user is asked to confirm `key_findings` for each (one short answer per entry) and then approve the batch. No per-field walking for the other fields — the data came verbatim from PubMed/CT.gov upstream.
+
+**Non-provisional files** (manually-dropped sources): walk the user through every §7.4 field as before. Each entry needs the seven fields:
 
 - `file:` — the post-move path relative to engagement repo root.
 - `citation:` — full bibliographic citation. **Always ask the user**; do not invent. For unpublished or internal documents, use a descriptive placeholder (e.g., "ALR-217 internal mechanism-of-action study report, document control ID XXX").
@@ -128,7 +147,9 @@ Each entry needs the seven §7.4 fields:
 - `tags:` — a YAML list of short slugs for downstream search (e.g., `[pivotal, phase-2, primary-endpoint, alr217]`). Propose from observation; user refines.
 - `ingested:` — today's ISO date (computed above).
 
-Propose all entries as a single block of markdown to the user, preceded by a brief summary of what each entry's `citation` and `key_findings` are claimed to be (so the user can quickly catch invented content).
+(Non-provisional entries do not include a `status:` line; absence defaults to `confirmed` per `schemas/kb-manifest.md`.)
+
+Propose all entries (provisional + non-provisional) as a single block of markdown to the user, preceded by a brief summary of what each entry's `citation` and `key_findings` are claimed to be (so the user can quickly catch invented content).
 
 ### Step 8 — Wait for explicit user approval of the manifest entries
 
