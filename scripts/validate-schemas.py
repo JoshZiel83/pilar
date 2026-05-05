@@ -9,11 +9,11 @@ template in `schemas/<artifact>.md`, and asserts:
   - no frontmatter value in the target is a `<placeholder>` left over from
     the template;
   - every H2 heading declared in the schema is present in the target;
-  - every entry-id heading (REF-NNN, P-NN, SS-NN, RS-NN, GAP-NNN, ASP-NNN,
-    FC-/ED-/CL-/SA-) matches the format conventions documented in
-    `docs/CONVENTIONS.md`;
+  - every entry-id heading (KB ref-id, P-NN, SS-NN, RS-NN, GAP-NNN,
+    ASP-NNN, FC-/ED-/CL-/SA-) matches the format conventions documented
+    in `docs/CONVENTIONS.md`;
   - entry ids are unique within their declared scope (e.g. no duplicate
-    SS-NN within one pillar, no duplicate REF-NNN within one manifest);
+    SS-NN within one pillar, no duplicate ref-id within one manifest);
   - composite-id references (linked_to, linked_statement, target,
     sources) are well-formed.
 
@@ -36,7 +36,7 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 ID_PATTERNS: dict[str, str] = {
-    "ref": r"^REF-\d{3}$",
+    "ref": r"^[A-Za-z0-9-]+(?:_[A-Za-z0-9-]+)+$",
     "pillar": r"^P-\d{2}$",
     "ss": r"^SS-\d{2}$",
     "rs": r"^RS-\d{2}$",
@@ -248,7 +248,7 @@ def validate_pillar_nested(target: Path, fm: dict[str, str], body: str) -> list[
                 )
             seen_rs.add(rs_id)
 
-        # sources: [REF-..., REF-...] checks within this SS body.
+        # sources: [<ref-id>, <ref-id>, ...] checks within this SS body.
         for sm in re.finditer(r"sources:\s*\[(.*?)\]", ss_body):
             for raw in sm.group(1).split(","):
                 ref = raw.strip()
@@ -257,7 +257,8 @@ def validate_pillar_nested(target: Path, fm: dict[str, str], body: str) -> list[
                 if not re.match(ID_PATTERNS["ref"], ref):
                     errors.append(
                         f"{target}: in {ss_id}, malformed source reference '{ref}' "
-                        "(expected REF-NNN)"
+                        "(expected property-based id, e.g. `Smith_J_2024_Synth-J-Med`; "
+                        "see docs/CONVENTIONS.md)"
                     )
 
     return errors
@@ -277,7 +278,7 @@ KB_MANIFEST_STATUS_VALUES = {"provisional", "confirmed"}
 
 
 def validate_kb_manifest_status(target: Path, body: str) -> list[str]:
-    """Validate that `- status:` lines on REF entries carry an allowed value.
+    """Validate that `- status:` lines on kb-manifest entries carry an allowed value.
 
     Absence is allowed (defaults to `confirmed` semantically). When present,
     only `provisional` or `confirmed` are permitted.

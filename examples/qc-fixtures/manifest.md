@@ -8,9 +8,9 @@ updated: 2026-05-02
 
 ## Entries
 
-### REF-001
+### Smith_J_2024_Synth-J-Oncol
 
-- file: examples/qc-fixtures/sources/REF-001.txt
+- file: examples/qc-fixtures/sources/Smith_J_2024_Synth-J-Oncol.txt
 - citation: ALR-217 pivotal Phase 2 study primary publication (synthetic; for QC fixture purposes only).
 - type: Single-arm Phase 2 trial
 - design: Open-label, single-arm, multi-center; primary endpoint ORR by independent review at week 24.

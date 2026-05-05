@@ -21,8 +21,8 @@ updated: 2026-05-02
 ### GAP-002
 
 - linked_to: P-99.SS-02.RS-01
-- description: Fixture orphan B — RS-01 of P-99.SS-02 cites REF-999, which does not exist in `knowledge-base/manifest.md`. Either the citation is in error (a different REF should replace it) or the source itself needs to be added to the KB.
-- evidence_type_needed: A KB source matching the RS's claim about mechanism, OR a corrected REF-NNN replacing the dangling REF-999.
+- description: Fixture orphan B — RS-01 of P-99.SS-02 cites Missing_X_2099_Synth-Test, which does not exist in `knowledge-base/manifest.md`. Either the citation is in error (a different ref-id should replace it) or the source itself needs to be added to the KB.
+- evidence_type_needed: A KB source matching the RS's claim about mechanism, OR a corrected ref-id replacing the dangling Missing_X_2099_Synth-Test.
 - proposed_search: Synthetic — in a real engagement the Librarian would resolve this by either re-examining the writer's drafting context (which source did they intend?) or sourcing a new publication from PubMed / preprint servers / internal preclinical data.
 - status: open
 - opened: 2026-05-02

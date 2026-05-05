@@ -7,11 +7,11 @@ Self-contained test scenario for exercising the Editor and Fact-Checker subagent
 ```
 examples/qc-fixtures/
 ├── pillar.md            # P-99 with one SS containing one RS that has known-bad copy
-├── manifest.md          # kb-manifest with one entry (REF-001) pointing to the source below
+├── manifest.md          # kb-manifest with one entry (Smith_J_2024_Synth-J-Oncol) pointing to the source below
 ├── lexicon.md           # two lexicon entries with clear avoid → preferred swaps
 ├── style-guide.md       # §9 defaults inherited; minimal otherwise
 └── sources/
-    └── REF-001.txt      # synthetic source content for REF-001
+    └── Smith_J_2024_Synth-J-Oncol.txt      # synthetic source content for Smith_J_2024_Synth-J-Oncol
 ```
 
 ## What this fixture is designed to elicit
@@ -19,8 +19,8 @@ examples/qc-fixtures/
 The RS body in `pillar.md` deliberately contains:
 
 1. **A lexicon avoid term.** "r/r diffuse large b-cell lymphoma" (lowercase b-cell). The Editor should swap to the preferred "DLBCL" form (or "diffuse large B-cell lymphoma" with proper orthography).
-2. **A §9 disallowed pattern.** Antithetical construction: "ALR-217 is not just active … it is highly effective at extending overall survival." The Editor should flag (the antithetical construction) and the Fact-Checker should flag the overstatement (REF-001 reports ORR only — no overall-survival data).
-3. **An overstatement vs cited source.** REF-001's "Limitations" section explicitly states "long-term follow-up including overall survival has not yet been reported." The RS's claim about overall survival extension is unsupported by the cited source; the Fact-Checker should flag this as `unsupported` or `overstatement`.
+2. **A §9 disallowed pattern.** Antithetical construction: "ALR-217 is not just active … it is highly effective at extending overall survival." The Editor should flag (the antithetical construction) and the Fact-Checker should flag the overstatement (Smith_J_2024_Synth-J-Oncol reports ORR only — no overall-survival data).
+3. **An overstatement vs cited source.** Smith_J_2024_Synth-J-Oncol's "Limitations" section explicitly states "long-term follow-up including overall survival has not yet been reported." The RS's claim about overall survival extension is unsupported by the cited source; the Fact-Checker should flag this as `unsupported` or `overstatement`.
 
 ## How to invoke
 
@@ -34,7 +34,7 @@ The expected behavior is:
 
 - Editor reads `pillar.md`, `lexicon.md`, `style-guide.md`. Applies the lexicon swap; flags the antithetical construction. Returns the two-block output.
 - Parent applies edited copy to `pillar.md`; saves editorial report under `qc/editorial-reports/`.
-- Fact-Checker reads the now-edited `pillar.md` plus `sources/REF-001.txt`. Flags the unsupported overall-survival claim. Returns a fact-check report.
+- Fact-Checker reads the now-edited `pillar.md` plus `sources/Smith_J_2024_Synth-J-Oncol.txt`. Flags the unsupported overall-survival claim. Returns a fact-check report.
 - Parent saves the fact-check report under `qc/fact-check-reports/` and surfaces both reports.
 
 This is an interactive smoke test, not part of CI. The static `context-audit` CI job continues to gate the prompt-template allowlists and the subagent isolation contracts on every PR.

@@ -41,7 +41,7 @@ Out of scope (deferred to other pillars): pivotal evidence presentation (P-04 Cl
 #### RS-01: Guideline framing of multi-dimensional treatment choice
 
 - status: approved
-- sources: [REF-003]
+- sources: [Roe_K_2024_Synth-Clin-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -62,7 +62,7 @@ Current B-cell lymphoma treatment guidelines acknowledge that treatment selectio
 #### RS-01: Clinical profile underpinning the value distribution
 
 - status: approved
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -71,7 +71,7 @@ The pivotal Phase 2 study of ALR-217 in r/r DLBCL after ≥2 prior lines reporte
 #### RS-02: Comparative operational profile
 
 - status: approved
-- sources: [REF-001, REF-002]
+- sources: [Smith_J_2024_Synth-J-Oncol, Doe_AB_2023_Synth-Lab-Med]
 - created: 2026-05-02
 - updated: 2026-05-02
 

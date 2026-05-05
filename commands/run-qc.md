@@ -36,7 +36,7 @@ Read the artifact at `artifact_arg`. Capture:
   - For scientific or reference statements (which only appear inside a pillar): the parent pillar's `pillar_id` plus the SS / RS id chain (e.g. `P-04.SS-01.RS-02`).
   - For other artifact types (rare for `/pilar:run-qc`): use the artifact's `project` value.
 - The artifact's frontmatter and body, separated by the closing `---` line.
-- `sources` — the union of `sources:` lists from all reference-statement blocks in the body (e.g. `[REF-001, REF-005]`).
+- `sources` — the union of `sources:` lists from all reference-statement blocks in the body (e.g. `[<ref-id-1>, <ref-id-2>]`).
 - `draft_id` — only when the artifact is a consolidated draft: the `draft_id:` value from frontmatter (e.g. `cd-001`).
 
 If `run_strategic_reviewer == true`: assert that the artifact's frontmatter `artifact:` value is `consolidated-draft`. If not, **stop** with usage hint: `--consolidated requires a consolidated-draft artifact (artifact: consolidated-draft in frontmatter); got artifact: <value>. Run /pilar:consolidate first.`
@@ -120,11 +120,11 @@ Validate it: `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py qc/edit
 
 For each ref-id in `sources` (collected in Step 2), look up the source file via `knowledge-base/manifest.md`:
 
-- Find the manifest entry whose heading matches the ref-id (e.g. `### REF-001`).
+- Find the manifest entry whose heading matches the ref-id (e.g. `### Smith_J_2024_Synth-J-Med`).
 - Read the `file:` path; resolve to absolute.
 - Verify the file exists.
 
-Collect the union as `source_paths` — a list of absolute paths ordered to match the artifact's RS source ordering. For unresolved sources, include `MISSING:<REF-NNN>` as a placeholder string at the corresponding position (the Fact-Checker treats these as gap findings).
+Collect the union as `source_paths` — a list of absolute paths ordered to match the artifact's RS source ordering. For unresolved sources, include `MISSING:<ref-id>` as a placeholder string at the corresponding position (the Fact-Checker treats these as gap findings).
 
 ### Step 7 — Invoke the Fact-Checker subagent
 

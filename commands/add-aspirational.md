@@ -159,7 +159,7 @@ Tell the user:
 >
 > When the linked evidence generation activity reads out:
 >
-> - If data supports the claim: update the RS sources to cite the new readout's `REF-NNN`; the RS becomes evidence-supported and the aspirational entry can be retired (`status: retired`).
+> - If data supports the claim: update the RS sources to cite the new readout's `<ref-id>`; the RS becomes evidence-supported and the aspirational entry can be retired (`status: retired`).
 > - If data does not support the claim: the fallback position becomes the platform's narrative; retire the aspirational entry (`status: retired`).
 >
 > Use `/pilar:add-aspirational` again to register additional aspirational statements as the engagement evolves.

@@ -8,7 +8,7 @@ updated: 2026-05-02
 
 ## Entries
 
-### REF-001
+### Smith_J_2024_Synth-J-Oncol
 
 - file: knowledge-base/clinical/alr217-phase2-pivotal.pdf
 - citation: Aurelis ALR-217 Phase 2 pivotal study, primary publication (placeholder citation for fixture purposes).
@@ -19,7 +19,7 @@ updated: 2026-05-02
 - tags: [pivotal, phase-2, primary-endpoint, alr217]
 - ingested: 2026-05-02
 
-### REF-002
+### Doe_AB_2023_Synth-Lab-Med
 
 - file: knowledge-base/preclinical/alr217-moa.pdf
 - citation: Mechanism-of-action study for ALR-217 (placeholder).
@@ -30,7 +30,7 @@ updated: 2026-05-02
 - tags: [mechanism, preclinical, alr217]
 - ingested: 2026-05-02
 
-### REF-003
+### Roe_K_2024_Synth-Clin-Oncol
 
 - file: knowledge-base/competitor/bispecific-A-pivotal.pdf
 - citation: Pivotal data publication for bispecific antibody A in r/r DLBCL (placeholder).
@@ -41,7 +41,7 @@ updated: 2026-05-02
 - tags: [competitor, bispecific, phase-2, dlbcl]
 - ingested: 2026-05-02
 
-### REF-004
+### XYZ_2024_BCL-Guidelines
 
 - file: knowledge-base/guidelines/nccn-bcell-lymphomas-excerpt.pdf
 - citation: NCCN Clinical Practice Guidelines in Oncology — B-cell Lymphomas, current version, 3rd-line section excerpt (placeholder).
@@ -52,7 +52,7 @@ updated: 2026-05-02
 - tags: [guideline, nccn, dlbcl, 3l]
 - ingested: 2026-05-02
 
-### REF-005
+### Smith_J_2024_SAMPLE25
 
 - file: knowledge-base/clinical/alr217-elderly-subgroup-ash.pdf
 - citation: ASH 2025 congress abstract reporting elderly-subgroup analysis from the ALR-217 pivotal study (placeholder).

@@ -8,6 +8,8 @@ updated: <iso-date>
 
 ## Entries
 
+<!-- ref-id grammar: property-based (e.g. `Smith_J_2024_Synth-J-Med`). See docs/CONVENTIONS.md §"KB manifest reference IDs" for the recommended shapes (journal article / congress abstract / guideline / pre-print) and the disambiguation rule. -->
+
 ### <ref-id>
 
 - file: <path>

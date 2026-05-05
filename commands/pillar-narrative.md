@@ -56,7 +56,7 @@ If `status` is `draft` but the `## Narrative` body is non-empty (i.e., not the M
 Read these in full or in part as noted:
 
 - `briefing.md` — full body. The drafting needs `## Indication`, `## Audiences`, `## Strategic Priorities`, `## Competitive Context`, `## Constraints`, `## Evidence Generation Activities`.
-- `knowledge-base/manifest.md` — capture every `### REF-NNN` entry's id, `type`, and `key_findings`. Group by `type` (e.g., `Single-arm Phase 2 trial: REF-001`; `Treatment guideline: REF-003`) — the narrative will reference categories of evidence available, not specific REFs (those are in scope for `/pilar:pillar-statements`).
+- `knowledge-base/manifest.md` — capture every `### <ref-id>` entry's id, `type`, and `key_findings`. Group by `type` (e.g., `Single-arm Phase 2 trial: <ref-id>, <ref-id>`; `Treatment guideline: <ref-id>`) — the narrative will reference categories of evidence available, not specific manifest entries (those are in scope for `/pilar:pillar-statements`).
 - `pillars/*.md` — for each pillar file at `status` ≥ `narrative-approved` (i.e., `narrative-approved`, `statements-approved`, or `complete`), capture the pillar's name, slug, and a one-sentence summary of its `## Narrative` (the first paragraph). This grounds cross-pillar consistency: the new narrative should not duplicate or contradict already-approved framing.
 
 ### Step 5 — Draft the three sections with the user
@@ -65,7 +65,7 @@ The Primary Collaborator drafts in the main session — no subagent. The user re
 
 **Strategic Rationale** — a one-paragraph (occasionally two) statement of *why this pillar exists* and *which Strategic Priority(ies) it advances*. Tie explicitly to the briefing's numbered Strategic Priorities. Mention the audience(s) primarily addressed.
 
-**Narrative** — the strategic argument the pillar makes and the evidentiary territory it covers. Two to four paragraphs typically. Grounded in available evidence categories from the manifest (without naming specific REFs — that's RS-level work). Should read in dry scientific tone per §6.6 / §9, with no §9 disallowed patterns (the Editor will catch any that slip in; the writer aims to avoid them at draft time).
+**Narrative** — the strategic argument the pillar makes and the evidentiary territory it covers. Two to four paragraphs typically. Grounded in available evidence categories from the manifest (without naming specific manifest entries — that's RS-level work). Should read in dry scientific tone per §6.6 / §9, with no §9 disallowed patterns (the Editor will catch any that slip in; the writer aims to avoid them at draft time).
 
 **Scope** — what is in scope for this pillar and what is explicitly out of scope (deferred to other pillars or the engagement boundary). Use the cross-pillar map from Step 4 to make in/out decisions concrete. Two short paragraphs or a brief in/out list.
 

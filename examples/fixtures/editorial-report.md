@@ -31,7 +31,7 @@ P-04 (Clinical Evidence) pillar — narrative, SS-01, and its two reference stat
 
 - target: P-04.SS-01.RS-02
 - category: tone
-- issue: "Generally consistent with the overall population" hedges in a way that may understate or overstate the actual subgroup result. The §9 disallowed-pattern check (item 5 — hedging without scientific reason) flagged this, but the hedging may reflect genuine evidentiary uncertainty given REF-005's source strength.
+- issue: "Generally consistent with the overall population" hedges in a way that may understate or overstate the actual subgroup result. The §9 disallowed-pattern check (item 5 — hedging without scientific reason) flagged this, but the hedging may reflect genuine evidentiary uncertainty given Smith_J_2024_SAMPLE25's source strength.
 - proposed_change: Replace with quantitative comparison (e.g. point-estimate-to-point-estimate) once the subgroup analysis is publicly accessible at a sufficient level of detail.
 - reason_not_edited: Tightening the hedge would require asserting a relationship between subgroup and overall population that is not directly supported by the abstract-level data alone. The hedge currently reflects appropriate evidentiary uncertainty per §8 (Editor preserves scientifically-weighted hedging).
 - severity: low

@@ -34,7 +34,7 @@ No client overrides yet.
 
 ## Citation Conventions
 
-Vancouver style for the platform's reference list. Inline citations as `[REF-NNN]` during pilar drafting; translation to Vancouver-numbered superscripts is downstream of pilar (§11). Congress abstracts cited with year and abstract number; peer-reviewed publications cited with full author list (or first author + et al if >6 authors), journal, year, volume, pages.
+Vancouver style for the platform's reference list. Inline citations as `[<ref-id>]` during pilar drafting (e.g. `[Smith_J_2024_Synth-J-Oncol]`); translation to Vancouver-numbered superscripts is downstream of pilar (§11). Congress abstracts cited with year and abstract number; peer-reviewed publications cited with full author list (or first author + et al if >6 authors), journal, year, volume, pages.
 
 ## Evidence Description Conventions
 

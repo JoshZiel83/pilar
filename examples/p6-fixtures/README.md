@@ -22,9 +22,9 @@ examples/p6-fixtures/
 
 The pillar at `pillars/p-99-orphan-test.md` deliberately contains:
 
-1. **A clean RS** (`P-99.SS-01.RS-01`) that cites `REF-001` (which exists in the manifest). `detect-gaps.py` should NOT flag this RS.
+1. **A clean RS** (`P-99.SS-01.RS-01`) that cites `Smith_J_2024_Synth-J-Oncol` (which exists in the manifest). `detect-gaps.py` should NOT flag this RS.
 2. **Orphan A** (`P-99.SS-01.RS-02`) with `sources: []`. `detect-gaps.py` should flag this with reason `empty sources list`.
-3. **Orphan B** (`P-99.SS-02.RS-01`) with `sources: [REF-001, REF-999]`. `detect-gaps.py` should flag this with reason `unresolved REF(s): REF-999`.
+3. **Orphan B** (`P-99.SS-02.RS-01`) with `sources: [Smith_J_2024_Synth-J-Oncol, Missing_X_2099_Synth-Test]`. `detect-gaps.py` should flag this with reason `unresolved ref-id(s): Missing_X_2099_Synth-Test`.
 
 The two GAP entries in `registers/evidence-gaps.md` represent the post-state where the writer has accepted both candidate gaps (with the Librarian-drafted `proposed_search:` filled in for each).
 
@@ -38,7 +38,7 @@ The single ASP entry in `registers/aspirational-statements.md` represents the po
 python3 ../../scripts/detect-gaps.py pillars knowledge-base/manifest.md
 ```
 
-Expected output: 2 orphans surfaced, with `composite_id` `P-99.SS-01.RS-02` (empty sources) and `P-99.SS-02.RS-01` (unresolved REF-999). The clean RS at `P-99.SS-01.RS-01` is NOT in the output. The summary line on stderr reads `detect-gaps: scanned 1 pillar(s); manifest has 3 REF entries; 2 orphan(s)`.
+Expected output: 2 orphans surfaced, with `composite_id` `P-99.SS-01.RS-02` (empty sources) and `P-99.SS-02.RS-01` (unresolved Missing_X_2099_Synth-Test). The clean RS at `P-99.SS-01.RS-01` is NOT in the output. The summary line on stderr reads `detect-gaps: scanned 1 pillar(s); manifest has 3 entries; 2 orphan(s)`.
 
 ### Validate every artifact in the fixture
 

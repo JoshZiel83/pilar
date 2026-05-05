@@ -6,8 +6,8 @@ in `registers/evidence-gaps.md` — when any of the following is true:
 
   * its `sources:` line is missing entirely;
   * its `sources:` value is the empty list `[]` or whitespace;
-  * its `sources: [REF-NNN, ...]` list cites one or more `REF-NNN` ids
-    that do not exist in `knowledge-base/manifest.md`.
+  * its `sources: [<ref-id>, ...]` list cites one or more ref-ids that
+    do not exist in `knowledge-base/manifest.md`.
 
 This script is the orphan-RS predicate that `/pilar:ingest-kb` invokes to
 propose `GAP-NNN` candidates after manifest changes. It is also runnable
@@ -50,7 +50,7 @@ _spec.loader.exec_module(vs)
 
 
 def extract_manifest_refs(manifest_path: Path) -> set[str]:
-    """Return the set of REF-NNN ids in the kb-manifest at `manifest_path`.
+    """Return the set of ref-ids in the kb-manifest at `manifest_path`.
 
     Returns an empty set if the manifest file is missing, has no Entries
     section, or contains only malformed headings — in which case every RS
@@ -117,7 +117,7 @@ def check_rs_orphan(
         joined = ", ".join(unresolved)
         return {
             "composite_id": composite_id,
-            "reason": f"unresolved REF(s): {joined}",
+            "reason": f"unresolved ref-id(s): {joined}",
             "current_sources": refs,
             "unresolved_refs": unresolved,
         }
@@ -255,7 +255,7 @@ def main(argv: list[str]) -> int:
 
     print(
         f"detect-gaps: scanned {len(pillar_files)} pillar(s); "
-        f"manifest has {len(manifest_refs)} REF entries; "
+        f"manifest has {len(manifest_refs)} entries; "
         f"{len(all_orphans)} orphan(s)",
         file=sys.stderr,
     )

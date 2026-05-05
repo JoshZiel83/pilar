@@ -41,7 +41,7 @@ Out of scope (deferred to other pillars): mechanism-of-action exposition for ALR
 #### RS-01: Treatment-guideline positioning of post-CAR-T options
 
 - status: approved
-- sources: [REF-003]
+- sources: [Roe_K_2024_Synth-Clin-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -62,7 +62,7 @@ Treatment guidelines for B-cell lymphomas describe the 3rd-line and post-CAR-T s
 #### RS-01: Bispecific monitoring requirements
 
 - status: approved
-- sources: [REF-002]
+- sources: [Doe_AB_2023_Synth-Lab-Med]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -71,7 +71,7 @@ Pivotal bispecific antibody data for r/r DLBCL describe monitoring protocols for
 #### RS-02: Guideline acknowledgment of access variability
 
 - status: approved
-- sources: [REF-003]
+- sources: [Roe_K_2024_Synth-Clin-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 

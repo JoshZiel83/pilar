@@ -38,7 +38,7 @@ Vancouver-style numbered citations within prose; full reference list assembled b
 
 ## Evidence Description Conventions
 
-Single-arm trial findings reported with point estimates and confidence intervals, never bare percentages. Median follow-up is mandatory context for time-to-event endpoints. Comparative claims against external controls (e.g., bispecific antibody data) must be framed as cross-trial descriptive comparisons, not formal comparisons. Mechanism-of-action statements grounded in REF-002 and clearly demarcated from clinical findings.
+Single-arm trial findings reported with point estimates and confidence intervals, never bare percentages. Median follow-up is mandatory context for time-to-event endpoints. Comparative claims against external controls (e.g., bispecific antibody data) must be framed as cross-trial descriptive comparisons, not formal comparisons. Mechanism-of-action statements grounded in Doe_AB_2023_Synth-Lab-Med and clearly demarcated from clinical findings.
 
 ## Other
 

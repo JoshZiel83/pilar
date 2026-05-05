@@ -7,7 +7,7 @@ argument-hint: [knowledge-base-path]
 Ingest sources from the engagement's `knowledge-base/` directory into `knowledge-base/manifest.md` per §6.2 of `scp-plugin-spec.md`. The command auto-detects mode:
 
 - **Initial intake** (manifest is empty): walk the user-dropped files, propose a taxonomy assignment against the default subfolders seeded by `/pilar:init`, refine with the user, move files into approved subfolders, propose manifest entries, write the manifest, propose the commit.
-- **Incremental** (manifest already has entries): detect new files (those whose path is not yet in the manifest), assign each to a subfolder using the existing taxonomy as a guide, propose entries continuing the `REF-NNN` sequence, append to the manifest.
+- **Incremental** (manifest already has entries): detect new files (those whose path is not yet in the manifest), assign each to a subfolder using the existing taxonomy as a guide, propose entries with property-based `<ref-id>` headings derived from each entry's authorship/year/venue per `docs/CONVENTIONS.md`, append to the manifest.
 
 The Librarian role (§4.2) has no QC-style independence contract — the Primary Collaborator runs this workflow with full briefing/roadmap context to make informed taxonomy and metadata proposals.
 
@@ -29,11 +29,10 @@ If `knowledge-base/manifest.md` is missing, **stop** — the engagement is under
 
 ### Step 2 — Determine ingestion mode
 
-Read `knowledge-base/manifest.md`. Match `^### REF-\d{3}$` against the body. Capture:
+Read `knowledge-base/manifest.md`. Match `^### \S+$` headings under `## Entries` against the body. Capture:
 
-- `existing_refs` — list of `REF-NNN` ids already in the manifest.
+- `existing_refs` — list of `<ref-id>` headings already in the manifest.
 - `existing_files` — for each existing entry, the value of its `file:` field (used in Step 3 to compute the new-file delta).
-- `next_ref_n` — `max(existing_refs) + 1` (or `1` if `existing_refs` is empty), zero-padded to three digits.
 
 Set the mode:
 
@@ -120,7 +119,7 @@ Confirm every file is now under one of the approved subfolders.
 
 Capture today's ISO date with `!date +%F` for the `ingested:` field.
 
-For each file, propose a `### REF-NNN` entry using sequential numbering starting at `next_ref_n` (computed in Step 2 — `REF-001` in initial mode; the next-after-highest-existing in incremental mode, honoring `docs/CONVENTIONS.md`'s append-only rule). Order is the user's call — propose by subfolder (clinical first, then preclinical, etc.) for readable ordering.
+For each file, propose a `### <ref-id>` entry whose heading is the property-based id derived from the source's authorship, year, and venue per `docs/CONVENTIONS.md` §"KB manifest reference IDs". For provisional files (frontmatter `provisional: true`) the id can be derived deterministically from the staged file's frontmatter (`authors[0]` surname + initials, `year`, `journal` abbreviation). For non-provisional files the id is constructed from the user-confirmed `citation:` field (or proposed by the agent and confirmed alongside the other fields below). Disambiguate collisions with `_a/_b/_c/...` per the convention. Verify the proposed id is not already present in `existing_refs`; if it is, the new file is almost certainly a duplicate of an existing manifest entry — surface to the user before proceeding. Order is the user's call — propose by subfolder (clinical first, then preclinical, etc.) for readable ordering.
 
 **Provisional files** (frontmatter `provisional: true`, written by `/pilar:research`): pre-populate the entry from the file's frontmatter; do not invent any field. Mapping:
 
@@ -131,7 +130,7 @@ For each file, propose a `### REF-NNN` entry using sequential numbering starting
 - `population:` — for PubMed: extract from MeSH if present (e.g. an MeSH like "Aged" → "elderly"); otherwise leave the value as `_TBD — extract from full text when acquired._`. For CT.gov: extract from eligibility (age range + condition list).
 - `key_findings:` — **always ask the user** even for provisional files. This is the editorial summary — the no-LLM-in-canonical-content principle does not extend to extraction-from-the-abstract because the user must judge what is load-bearing for the engagement. Surface the abstract verbatim alongside the prompt to help the writer answer concisely.
 - `tags:` — for PubMed: subset of `mesh_terms` rendered as kebab-case slugs (cap at ~5). For CT.gov: `conditions` + `interventions` rendered the same way.
-- `status: provisional` — added to the entry; flags this REF as metadata-only awaiting full-text upgrade.
+- `status: provisional` — added to the entry; flags this entry as metadata-only awaiting full-text upgrade.
 - `ingested:` — today's ISO date.
 
 Pre-populated provisional entries are surfaced as a single block; the user is asked to confirm `key_findings` for each (one short answer per entry) and then approve the batch. No per-field walking for the other fields — the data came verbatim from PubMed/CT.gov upstream.
@@ -167,9 +166,9 @@ Update the manifest's `updated:` frontmatter field to today's ISO date.
 - `project: <project from roadmap.md frontmatter>`
 - `updated: <today's ISO date>`
 
-Body: `# Knowledge Base Manifest` H1, `## Entries` H2, then every approved `### REF-NNN` entry block in agreed order, separated by blank lines. Use Edit against the stub or Write the full file if the stub body is empty whitespace.
+Body: `# Knowledge Base Manifest` H1, `## Entries` H2, then every approved `### <ref-id>` entry block in agreed order, separated by blank lines. Use Edit against the stub or Write the full file if the stub body is empty whitespace.
 
-**In incremental mode**: append the new entry blocks under `## Entries` after the last existing `### REF-NNN` entry, separated by blank lines. Use the Edit tool with `old_string` matching the last few lines of the existing final entry plus the trailing newline; `new_string` is those same lines plus the new entry blocks. Do not touch the existing entries' content — append-only. Update the `updated:` frontmatter via a separate Edit.
+**In incremental mode**: append the new entry blocks under `## Entries` after the last existing `### <ref-id>` entry, separated by blank lines. Use the Edit tool with `old_string` matching the last few lines of the existing final entry plus the trailing newline; `new_string` is those same lines plus the new entry blocks. Do not touch the existing entries' content — append-only. Update the `updated:` frontmatter via a separate Edit.
 
 ### Step 10 — Validate the manifest
 
@@ -260,7 +259,7 @@ chore(pilar): N evidence gap(s) opened from orphan-RS scan
 
 Auto-detected by scripts/detect-gaps.py after KB ingest. Each
 GAP-NNN links to a reference statement whose sources are missing,
-empty, or cite REF-NNN ids absent from the manifest. Librarian
+empty, or cite ref-ids absent from the manifest. Librarian
 drafted proposed_search per orphan from briefing and audience
 context.
 ```

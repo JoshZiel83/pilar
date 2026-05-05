@@ -16,7 +16,7 @@ This pillar exists only as a fixture for exercising the P6 orphan-RS predicate (
 
 ## Narrative
 
-Synthetic fixture content. Two scientific statements; three reference statements; two of the three RS are deliberately orphan to demonstrate the two structural detection paths (empty sources list; cited REF that does not resolve to a manifest entry).
+Synthetic fixture content. Two scientific statements; three reference statements; two of the three RS are deliberately orphan to demonstrate the two structural detection paths (empty sources list; cited ref-id that does not resolve to a manifest entry).
 
 ## Scope
 
@@ -36,14 +36,14 @@ In scope: detection-path fixtures only. No real scientific argument is made.
 
 **Reference Statements.**
 
-#### RS-01: Clean RS — supported by REF-001
+#### RS-01: Clean RS — supported by Smith_J_2024_Synth-J-Oncol
 
 - status: draft
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
-This RS cites REF-001, which exists in the manifest. `detect-gaps.py` should NOT flag it.
+This RS cites Smith_J_2024_Synth-J-Oncol, which exists in the manifest. `detect-gaps.py` should NOT flag it.
 
 #### RS-02: Orphan A — empty sources list
 
@@ -66,14 +66,14 @@ This RS has an empty `sources:` list. `detect-gaps.py` should flag it with reaso
 
 **Reference Statements.**
 
-#### RS-01: Orphan B — unresolved REF in sources list
+#### RS-01: Orphan B — unresolved ref-id in sources list
 
 - status: draft
-- sources: [REF-001, REF-999]
+- sources: [Smith_J_2024_Synth-J-Oncol, Missing_X_2099_Synth-Test]
 - created: 2026-05-02
 - updated: 2026-05-02
 
-This RS cites REF-999, which does not exist in the manifest. `detect-gaps.py` should flag it with reason "unresolved REF(s): REF-999".
+This RS cites Missing_X_2099_Synth-Test, which does not exist in the manifest. `detect-gaps.py` should flag it with reason "unresolved ref-id(s): Missing_X_2099_Synth-Test".
 
 ## Open Items
 
