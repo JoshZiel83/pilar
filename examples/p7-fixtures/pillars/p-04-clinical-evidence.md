@@ -43,7 +43,7 @@ Out of scope (deferred to other pillars): mechanism-of-action exposition (P-03 M
 #### RS-01: Phase 2 overall response rate
 
 - status: approved
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -52,7 +52,7 @@ In the ALR-217 pivotal Phase 2 study, the overall response rate by independent r
 #### RS-02: Single-arm context relative to bispecific antibody data
 
 - status: approved
-- sources: [REF-001, REF-002]
+- sources: [Smith_J_2024_Synth-J-Oncol, Doe_AB_2023_Synth-Lab-Med]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -73,7 +73,7 @@ The ALR-217 pivotal study and the principal bispecific antibody pivotal data in 
 #### RS-01: Adverse events reported in the pivotal study
 
 - status: approved
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -82,7 +82,7 @@ The most common adverse events reported in the ALR-217 pivotal Phase 2 study wer
 #### RS-02: Operational implications for community treatment settings
 
 - status: approved
-- sources: [REF-001, REF-003]
+- sources: [Smith_J_2024_Synth-J-Oncol, Roe_K_2024_Synth-Clin-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 

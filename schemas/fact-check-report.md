@@ -9,7 +9,7 @@ created: <iso-date>
 
 ## Scope
 
-<text — what artifacts were fact-checked, e.g. "P-04.SS-01 with its two RS, against the cited sources REF-001 and REF-005">
+<text — what artifacts were fact-checked, e.g. "P-04.SS-01 with its two RS, against the cited sources `<ref-id-1>` and `<ref-id-2>`">
 
 ## Findings
 

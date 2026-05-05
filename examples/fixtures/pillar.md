@@ -41,7 +41,7 @@ Out of scope (deferred to other pillars): treatment-sequencing recommendations (
 #### RS-01: Phase 2 overall response rate
 
 - status: draft
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
@@ -50,7 +50,7 @@ In the ALR-217 pivotal Phase 2 study, the overall response rate by independent r
 #### RS-02: Elderly subgroup efficacy
 
 - status: draft
-- sources: [REF-001, REF-005]
+- sources: [Smith_J_2024_Synth-J-Oncol, Smith_J_2024_SAMPLE25]
 - created: 2026-05-02
 - updated: 2026-05-02
 

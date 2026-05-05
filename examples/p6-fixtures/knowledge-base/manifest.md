@@ -8,7 +8,7 @@ updated: 2026-05-02
 
 ## Entries
 
-### REF-001
+### Smith_J_2024_Synth-J-Oncol
 
 - file: knowledge-base/clinical/pivotal-trial.md
 - citation: ALR-217 pivotal Phase 2 trial, primary publication (synthetic fixture file).
@@ -19,7 +19,7 @@ updated: 2026-05-02
 - tags: [pivotal, phase-2, alr217, fixture]
 - ingested: 2026-05-02
 
-### REF-002
+### Doe_AB_2023_Synth-Lab-Med
 
 - file: knowledge-base/competitor/bispecific-summary.md
 - citation: Bispecific antibody A pivotal Phase 2 data summary (synthetic fixture file).
@@ -30,7 +30,7 @@ updated: 2026-05-02
 - tags: [competitor, bispecific, fixture]
 - ingested: 2026-05-02
 
-### REF-003
+### Roe_K_2024_Synth-Clin-Oncol
 
 - file: knowledge-base/guidelines/nccn-3l-excerpt.md
 - citation: NCCN B-cell lymphomas 3rd-line section excerpt (synthetic fixture file).

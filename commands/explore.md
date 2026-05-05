@@ -6,7 +6,7 @@ argument-hint: <pillar-id> [--angle "<hypothesis>"]
 
 Bounded exploration of KB source content for one pillar (a P7 refinement to the per-pillar drafting workflow). The writer brings a hypothesis or angle ("does the pivotal data actually support a durability claim?", "is safety a credible differentiation axis vs bispecifics?"); the command surfaces relevant manifest sources, **reads the actual file content** (markdown, txt, or PDF via the Read tool's `pages` parameter for large PDFs), and produces a synthesis discussion.
 
-This is the read-source-content companion to `/pilar:pillar-narrative` (which groups manifest entries by `type` for high-level framing) and `/pilar:pillar-statements` (which surfaces REF metadata as RS sourcing options) — neither of those commands opens source files. Use `/pilar:explore` between them when an angle is worth probing against the data before committing it to drafted copy.
+This is the read-source-content companion to `/pilar:pillar-narrative` (which groups manifest entries by `type` for high-level framing) and `/pilar:pillar-statements` (which surfaces manifest-entry metadata as RS sourcing options) — neither of those commands opens source files. Use `/pilar:explore` between them when an angle is worth probing against the data before committing it to drafted copy.
 
 The output is a synthesis. Saving is optional; if saved, the synthesis is appended as a dated H2 section to `explorations/p-NN.md` (one file per pillar; sections accumulate across invocations). Files in `explorations/` are scratch markdown — not §7 artifacts — and are not schema-validated.
 
@@ -20,7 +20,7 @@ Run:
 
 !`pwd && ls -1 roadmap.md briefing.md knowledge-base/manifest.md 2>&1 | head -5`
 
-If `roadmap.md` is missing, **stop** and recommend `/pilar:init`. If `knowledge-base/manifest.md` is missing or has zero `### REF-NNN` entries, **stop** and recommend `/pilar:ingest-kb` first — without sources in the manifest there is nothing to read.
+If `roadmap.md` is missing, **stop** and recommend `/pilar:init`. If `knowledge-base/manifest.md` is missing or has zero `### <ref-id>` entries, **stop** and recommend `/pilar:ingest-kb` first — without sources in the manifest there is nothing to read.
 
 Parse `$ARGUMENTS`:
 
@@ -57,7 +57,7 @@ Read `briefing.md` and capture `## Strategic Priorities`, `## Audiences`, `## In
 
 ### Step 4 — Read the KB manifest
 
-Read `knowledge-base/manifest.md`. For every `### REF-NNN` entry, capture the id, `file:`, `type`, and `key_findings:`. Build the candidate source list.
+Read `knowledge-base/manifest.md`. For every `### <ref-id>` entry, capture the id, `file:`, `type`, and `key_findings:`. Build the candidate source list.
 
 ### Step 5 — Capture exploration scope (the bounded hypothesis)
 
@@ -71,39 +71,39 @@ Wait for the user's response. Capture as `angle`. The angle remains the lens thr
 
 ### Step 6 — Surface relevant manifest sources, ranked
 
-Rank every manifest REF by likely relevance to `angle`. Use the REF's `type` and `key_findings` as ranking signals: a `type: Single-arm Phase 2 trial` ranks high for an efficacy or safety angle; a `type: Treatment guideline` ranks high for a positioning or sequencing angle; a `type: Mechanism-of-action` ranks high for a biology angle.
+Rank every manifest entry by likely relevance to `angle`. Use each entry's `type` and `key_findings` as ranking signals: a `type: Single-arm Phase 2 trial` ranks high for an efficacy or safety angle; a `type: Treatment guideline` ranks high for a positioning or sequencing angle; a `type: Mechanism-of-action` ranks high for a biology angle.
 
-Present a ranked list, one REF per line:
+Present a ranked list, one entry per line — one column for the `<ref-id>`, one for the `type`, a star-rating column for the agent's relevance estimate, then a short label:
 
 ```
 Manifest sources ranked by likely relevance to "<angle>":
 
-  REF-001  Single-arm Phase 2 trial   ★★★  ALR-217 pivotal — ORR primary endpoint
-  REF-002  Phase 2 pivotal trial       ★★   bispecific A — competitor data
-  REF-003  Treatment guideline         ★    NCCN 3rd-line excerpt
+  <ref-id-1>   Single-arm Phase 2 trial   ★★★  ALR-217 pivotal — ORR primary endpoint
+  <ref-id-2>   Phase 2 pivotal trial       ★★   bispecific A — competitor data
+  <ref-id-3>   Treatment guideline         ★    NCCN 3rd-line excerpt
   …
 ```
 
-Ask the user: *"Which REF(s) would you like to explore? (Comma-separated REF ids; or 'top N' for the top-ranked N; or 'all' if the manifest is short.)"*
+Ask the user: *"Which source(s) would you like to explore? (Comma-separated `<ref-id>` values; or 'top N' for the top-ranked N; or 'all' if the manifest is short.)"*
 
 Wait for the user's selection. Capture as `picked_refs`. **Bounded by user direction** — they decide breadth.
 
 ### Step 7 — Read each picked source and discuss findings against the angle
 
-For each REF in `picked_refs`:
+For each `<ref-id>` in `picked_refs`:
 
 1. Look up the source path from the manifest entry (the `file:` value, resolved relative to the engagement repo root).
 2. Use the Read tool on the source file. For PDFs, use the `pages: "1-10"` parameter on the first read (the spec's binary KB inputs are committed as-is per §3, and the Read tool handles PDFs natively); after reading the first 10 pages, ask the user *"Read deeper? (specify a page range like 11-20, or 'no')"* — extend the read only if the user opts in.
 3. Surface key passages, quotes, and concepts relevant to `angle`. Quote when a specific sentence or phrase from the source is load-bearing for the synthesis. Note absences too — a Limitations section that does NOT discuss durability is itself a finding for a durability angle.
-4. Discuss with the user. They may want to refine the angle, add another REF, or move on. Iterate briefly.
+4. Discuss with the user. They may want to refine the angle, add another source, or move on. Iterate briefly.
 
-If a source file is missing from disk (the manifest may reference an unconverted binary), surface this and **skip** that REF without stopping — the exploration continues with the remaining picks.
+If a source file is missing from disk (the manifest may reference an unconverted binary), surface this and **skip** that entry without stopping — the exploration continues with the remaining picks.
 
 ### Step 8 — Write the synthesis
 
 Compose a 1–2 paragraph synthesis covering:
 
-1. **What the exploration supports, refutes, or suggests** with respect to `angle`. Be specific about which REF(s) ground each claim.
+1. **What the exploration supports, refutes, or suggests** with respect to `angle`. Be specific about which manifest entry/entries ground each claim.
 2. **What's still unclear** — gaps the sources don't address, hedging the angle requires.
 3. **Concrete framings for downstream drafting** — phrasings the writer might reuse (or avoid) in the eventual `/pilar:pillar-narrative` or `/pilar:pillar-statements` work.
 
@@ -136,7 +136,7 @@ Compute the H2 section heading: `## <today's ISO date> — <slug>` (e.g. `## 202
 Compute the section body:
 
 - The 1–2 paragraph synthesis from Step 8.
-- A trailing line: `**References explored:** REF-NNN, REF-NNN, …` listing the REFs actually read in Step 7 (excluding any that were skipped due to missing files).
+- A trailing line: `**References explored:** <ref-id>, <ref-id>, …` listing the entries actually read in Step 7 (excluding any that were skipped due to missing files).
 
 Check whether `explorations/<pillar_id>.md` exists:
 
@@ -147,7 +147,7 @@ Check whether `explorations/<pillar_id>.md` exists:
 
 Run `git status` to show changes.
 
-Propose this commit message (substitute `<pillar_id>`, `<short angle phrasing>`, and the count of REFs read):
+Propose this commit message (substitute `<pillar_id>`, `<short angle phrasing>`, and the count of sources read):
 
 ```
 docs(pilar): exploration — <pillar_id> <short angle phrasing>

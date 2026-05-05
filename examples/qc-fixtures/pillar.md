@@ -39,11 +39,11 @@ In scope: exercise Editor + Fact-Checker on a known-bad RS. Out of scope: anythi
 #### RS-01: Phase 2 efficacy
 
 - status: draft
-- sources: [REF-001]
+- sources: [Smith_J_2024_Synth-J-Oncol]
 - created: 2026-05-02
 - updated: 2026-05-02
 
-In the pivotal Phase 2 study (REF-001), ALR-217 is not just active in r/r diffuse large b-cell lymphoma, it is highly effective at extending overall survival in this population.
+In the pivotal Phase 2 study (Smith_J_2024_Synth-J-Oncol), ALR-217 is not just active in r/r diffuse large b-cell lymphoma, it is highly effective at extending overall survival in this population.
 
 ## Open Items
 

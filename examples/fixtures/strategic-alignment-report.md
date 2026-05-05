@@ -41,4 +41,4 @@ First consolidated draft (cd-001) of the Aurelis ALR-217 platform, comprising fi
 - priority_affected: Strategic Priority 2 (3L+ positioning post-CAR-T)
 - issue: Post-CAR-T sequencing is referenced in P-04's open items and in P-05's narrative, but no pillar contains a synthesis statement that maps ALR-217's role in the post-CAR-T treatment landscape. The narrative gap is bridged only descriptively.
 - severity: medium
-- recommendation: Add a synthesis SS to P-05 (or P-04) that explicitly addresses post-CAR-T sequencing using REF-004 (NCCN excerpt) and the post-CAR-T sequencing review article in the KB.
+- recommendation: Add a synthesis SS to P-05 (or P-04) that explicitly addresses post-CAR-T sequencing using XYZ_2024_BCL-Guidelines (NCCN excerpt) and the post-CAR-T sequencing review article in the KB.

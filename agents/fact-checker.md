@@ -20,8 +20,8 @@ You have the **Read** tool for the sole purpose of reading those paths. You **mu
 
 ## Your task
 
-1. Read the artifact at `{artifact_path}`. Parse its scientific statements (`### SS-NN: ...`) and the reference statements within each (`#### RS-NN: ...`, with their `sources: [REF-NNN, ...]` field).
-2. Read each source file at `{source_paths}`. The order of paths in `{source_paths}` matches the order of the `REF-NNN` ids referenced by the artifact's reference statements.
+1. Read the artifact at `{artifact_path}`. Parse its scientific statements (`### SS-NN: ...`) and the reference statements within each (`#### RS-NN: ...`, with their `sources: [<ref-id>, ...]` field).
+2. Read each source file at `{source_paths}`. The order of paths in `{source_paths}` matches the order of the `<ref-id>` values referenced by the artifact's reference statements.
 3. For each reference statement, evaluate against its cited sources:
    - **Support.** Does the cited source actually contain the finding the RS attributes to it? If no source supports the claim, flag `unsupported`.
    - **Overstatement.** Does the RS state more than the source actually shows (e.g. claims "demonstrated" where the source reports "associated with")? Flag `overstatement`.

@@ -197,7 +197,7 @@ Sprint engine:
 KB and research:
 
 - `/pilar:ingest-kb` — auto-detected initial-intake or incremental ingestion of `knowledge-base/`. Walks new files (drop them anywhere under `knowledge-base/`; `for_ingestion/` is the recommended drop point), proposes taxonomy + manifest entries, runs the orphan-RS scan after ingest.
-- `/pilar:research "<instruction>"` — targeted PubMed and ClinicalTrials.gov search via MCP. Saves kept hits as provisional KB sources under `knowledge-base/for_ingestion/`. Run `/pilar:ingest-kb` afterward to file them as REFs (status: provisional). Requires the **PubMed** and **Clinical Trials** Claude.ai connectors enabled. Includes a `--verify` mode for drift detection on saved provisional content.
+- `/pilar:research "<instruction>"` — targeted PubMed and ClinicalTrials.gov search via MCP. Saves kept hits as provisional KB sources under `knowledge-base/for_ingestion/`. Run `/pilar:ingest-kb` afterward to file them as manifest entries at `status: provisional`. Requires the **PubMed** and **Clinical Trials** Claude.ai connectors enabled. Includes a `--verify` mode for drift detection on saved provisional content.
 - `/pilar:add-aspirational <composite-id>` — register an §7.7 aspirational statement against a pillar/SS/RS.
 
 Per-pillar drafting:

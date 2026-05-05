@@ -50,7 +50,7 @@ Sprint 8 in flight: consolidated `cd-001` and ran the whole-deliverable review (
 ## Sprint History
 
 - Sprint 1: briefing.
-- Sprint 2: KB initial intake (REF-001..003).
+- Sprint 2: KB initial intake (Smith_J_2024_Synth-J-Oncol..003).
 - Sprint 3: scaffolding recommendation (5-pillar set).
 - Sprint 4: P-04 narrative + statements drafted; P-04 → statements-approved.
 - Sprint 5: P-01 narrative + statements drafted; P-01 → statements-approved.
