@@ -93,9 +93,7 @@ Capture today's ISO date with `!date +%F`. Edit the pillar file's frontmatter `u
 
 ### Step 8 — Validate
 
-Run:
-
-!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>`
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>` (substituting the captured `<pillar_path>`).
 
 If validation fails, surface errors and correct via Edits before continuing.
 

@@ -67,7 +67,7 @@ If the script succeeds, capture the resulting `<cd-id>` from the script's stderr
 
 ### Step 5 — Validate the consolidated draft
 
-!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py consolidated/<cd-id>.md`
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py consolidated/<cd-id>.md` (substituting the captured `<cd-id>`).
 
 Expected: `Validated 1 file(s); 0 error(s)`. If validation fails (rare — the script's output is byte-deterministic and the schema constraints are mechanical), surface the errors and **stop** before proposing a commit. The likely failure mode is a malformed input artifact (e.g. a pillar's frontmatter missing required keys); fix the source artifact and re-run.
 

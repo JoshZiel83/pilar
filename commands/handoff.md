@@ -39,9 +39,7 @@ The whole-deliverable review for `<cd-id>` produces three reports — editorial,
 - Fact-check report: `qc/fact-check-reports/sprint-*-fact-check-<cd-id>.md` (most recent if multiple).
 - Strategic-alignment report: `qc/strategic-alignment-reports/sprint-*-strategic-<cd-id>.md` (most recent if multiple).
 
-Run:
-
-!`ls -1 qc/editorial-reports/sprint-*-editorial-<cd-id>.md qc/fact-check-reports/sprint-*-fact-check-<cd-id>.md qc/strategic-alignment-reports/sprint-*-strategic-<cd-id>.md 2>&1`
+Run `ls -1 qc/editorial-reports/sprint-*-editorial-<cd-id>.md qc/fact-check-reports/sprint-*-fact-check-<cd-id>.md qc/strategic-alignment-reports/sprint-*-strategic-<cd-id>.md 2>&1` (substituting the captured `<cd-id>`).
 
 If any of the three is missing, **stop**:
 

@@ -92,17 +92,13 @@ Edit the pillar's frontmatter `updated:` field to today's ISO date.
 
 ### Step 7 — Validate
 
-Run:
-
-!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>`
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>` (substituting the captured `<pillar_path>`).
 
 The validator enforces SS-NN / RS-NN format, uniqueness within scope (no duplicate SS-NN within the pillar; no duplicate RS-NN within an SS), and `sources: [REF-NNN, …]` format. If validation fails, surface errors and correct via Edits before continuing.
 
 ### Step 8 — Orphan-RS check
 
-Run:
-
-!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py <pillar_path> knowledge-base/manifest.md --format json`
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py <pillar_path> knowledge-base/manifest.md --format json` (substituting the captured `<pillar_path>`).
 
 Parse the JSON. If `orphan_count` is 0, proceed silently to Step 9.
 

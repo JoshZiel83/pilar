@@ -224,7 +224,7 @@ Tell the writer (substituting `N` = number of provisional sources staged):
 > - When the full PDF/source arrives: drop it into the appropriate `knowledge-base/<subfolder>/`, update the REF entry's `file:` and `status:` fields, and the REF becomes confirmed.
 > - To check whether provisional content has drifted vs. upstream:
 >
->   !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/research-fetch.py --verify <file>`
+>   `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/research-fetch.py --verify <file>`
 >
 >   The `--verify` mode re-fetches the source and diffs critical fields (title, sponsor / first author, journal, abstract / brief summary). Exit 0 = clean; exit 1 = drift detected with diff.
 
