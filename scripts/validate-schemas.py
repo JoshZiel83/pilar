@@ -273,6 +273,26 @@ def validate_composite_refs_in_body(target: Path, body: str) -> list[str]:
     return errors
 
 
+KB_MANIFEST_STATUS_VALUES = {"provisional", "confirmed"}
+
+
+def validate_kb_manifest_status(target: Path, body: str) -> list[str]:
+    """Validate that `- status:` lines on REF entries carry an allowed value.
+
+    Absence is allowed (defaults to `confirmed` semantically). When present,
+    only `provisional` or `confirmed` are permitted.
+    """
+    errors: list[str] = []
+    for m in re.finditer(r"^- status:\s*(.+?)\s*$", body, re.MULTILINE):
+        value = m.group(1)
+        if value not in KB_MANIFEST_STATUS_VALUES:
+            errors.append(
+                f"{target}: kb-manifest entry `status: {value}` is not allowed; "
+                f"valid values are {sorted(KB_MANIFEST_STATUS_VALUES)} (or omit for default `confirmed`)"
+            )
+    return errors
+
+
 def validate(target: Path, schema_dir: Path) -> list[str]:
     if not target.exists():
         return [f"{target}: file does not exist"]
@@ -325,6 +345,9 @@ def validate(target: Path, schema_dir: Path) -> list[str]:
 
     if artifact == "pillar":
         errors.extend(validate_pillar_nested(target, fm, body))
+
+    if artifact == "kb-manifest":
+        errors.extend(validate_kb_manifest_status(target, body))
 
     # Composite-id references (linked_to, linked_statement) in any artifact body.
     errors.extend(validate_composite_refs_in_body(target, body))

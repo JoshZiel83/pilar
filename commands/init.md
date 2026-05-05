@@ -42,6 +42,7 @@ mkdir -p \
   knowledge-base/guidelines \
   knowledge-base/competitor \
   knowledge-base/other \
+  knowledge-base/for_ingestion \
   pillars \
   registers \
   explorations \
@@ -52,7 +53,7 @@ mkdir -p \
   sprints
 
 for d in \
-  knowledge-base/clinical knowledge-base/preclinical knowledge-base/guidelines knowledge-base/competitor knowledge-base/other \
+  knowledge-base/clinical knowledge-base/preclinical knowledge-base/guidelines knowledge-base/competitor knowledge-base/other knowledge-base/for_ingestion \
   pillars registers explorations consolidated \
   qc/fact-check-reports qc/editorial-reports qc/strategic-alignment-reports \
   sprints
@@ -64,6 +65,8 @@ done
 Note on `explorations/`: this directory holds optional per-pillar exploration notes produced by `/pilar:explore` (a P7 refinement). Files in this directory are scratch markdown — not §7 artifacts — and are not validated by `scripts/validate-schemas.py`. The directory is committed (with `.gitkeep`) so future `/pilar:explore` invocations have a stable target path.
 
 Note on `consolidated/`: this directory holds assembled `consolidated/cd-NNN.md` whole-deliverable views produced by `/pilar:consolidate` (P8). Each `cd-NNN` is a `consolidated-draft` artifact (`schemas/consolidated-draft.md`) that the whole-deliverable review (`/pilar:run-qc --consolidated`) operates on. The directory is committed (with `.gitkeep`) so the first `/pilar:consolidate` invocation has a stable target.
+
+Note on `knowledge-base/for_ingestion/`: this is a **convenience staging folder** for new sources awaiting `/pilar:ingest-kb`. Both `/pilar:research` (which writes provisional sources from PubMed and ClinicalTrials.gov) and the writer (who can drop new PDFs/text files here manually) use it. `/pilar:ingest-kb` continues to scan all of `knowledge-base/` for new files — `for_ingestion/` is recommended, not required. During ingestion, files are moved to the appropriate taxonomy subfolder (`clinical/`, `preclinical/`, etc.), so `for_ingestion/` ends empty after each ingest run.
 
 ### Step 4 — Intake interview
 
@@ -185,10 +188,30 @@ If `current_sprint` is 0 or no sprints exist yet, the engagement is in pre-Sprin
 
 ## Available pilar slash commands
 
-- `/pilar:sprint-plan` — open a new sprint (drafts the plan from roadmap's Next Sprint Scope; you approve before commit).
-- `/pilar:sprint-close` — close the active sprint (drafts the summary; you respond Confirm / Request revisions / Defer / Rewind at the checkpoint).
+Sprint engine:
+
+- `/pilar:sprint-plan` — open a new sprint (drafts the plan from roadmap state and prior sprint summary; you approve before commit).
+- `/pilar:sprint-close` — close the active sprint at the §5.3 checkpoint (drafts the summary; you respond Confirm / Request revisions / Defer / Rewind).
 - `/pilar:sprint-amend` — amend the active sprint plan in flight if scope changes during execution.
-- `/pilar:run-qc <artifact-path>` — run the Phase 2 stub Fact-Checker subagent under the §4/§8 Independence Contract (real QC arrives with Phase 5 of pilar).
+
+KB and research:
+
+- `/pilar:ingest-kb` — auto-detected initial-intake or incremental ingestion of `knowledge-base/`. Walks new files (drop them anywhere under `knowledge-base/`; `for_ingestion/` is the recommended drop point), proposes taxonomy + manifest entries, runs the orphan-RS scan after ingest.
+- `/pilar:research "<instruction>"` — targeted PubMed and ClinicalTrials.gov search via MCP. Saves kept hits as provisional KB sources under `knowledge-base/for_ingestion/`. Run `/pilar:ingest-kb` afterward to file them as REFs (status: provisional). Requires the **PubMed** and **Clinical Trials** Claude.ai connectors enabled. Includes a `--verify` mode for drift detection on saved provisional content.
+- `/pilar:add-aspirational <composite-id>` — register an §7.7 aspirational statement against a pillar/SS/RS.
+
+Per-pillar drafting:
+
+- `/pilar:scaffold-pillars` — once-per-engagement: propose the §6.4 default pillar set tailored to the briefing; write stubs; populate roadmap's `## Pillars` table.
+- `/pilar:explore <P-NN> [--angle "<text>"]` — bounded, hypothesis-driven exploration of KB source content for one pillar. Produces optional synthesis note in `explorations/<pillar-id>.md`.
+- `/pilar:pillar-narrative <P-NN>` — draft Strategic Rationale, Narrative, Scope. Mark `narrative-approved` at end.
+- `/pilar:pillar-statements <P-NN>` — draft Scientific Statements + Reference Statements. Runs orphan-RS scan; mark `statements-approved` at end.
+
+Quality control and consolidation:
+
+- `/pilar:run-qc <artifact-path> [--context drafting|consolidated-draft] [--consolidated]` — runs Editor + Fact-Checker (drafting context) or Editor + Fact-Checker + Strategic Reviewer (consolidated context) under the §4/§8 Independence Contract.
+- `/pilar:consolidate` — deterministic mechanical assembly of approved pillars + briefing + lexicon + style guide into `consolidated/cd-NNN.md` (§6.7).
+- `/pilar:handoff` — finalize the engagement after the consolidated draft clears review (§6.9). Walks user through clearance for high-severity findings; proposes the engagement-handoff git tag with explicit per-tag approval.
 
 ## Engagement-level vs Claude Code task-level work
 
