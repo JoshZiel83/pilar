@@ -193,6 +193,7 @@ Sprint engine:
 - `/pilar:sprint-plan` — open a new sprint (drafts the plan from roadmap state and prior sprint summary; you approve before commit).
 - `/pilar:sprint-close` — close the active sprint at the §5.3 checkpoint (drafts the summary; you respond Confirm / Request revisions / Defer / Rewind).
 - `/pilar:sprint-amend` — amend the active sprint plan in flight if scope changes during execution.
+- `/pilar:sprint-pause` — snapshot mid-sprint progress without closing. Appends a dated sub-section to the active plan's `## Pause Notes` and commits.
 
 KB and research:
 
