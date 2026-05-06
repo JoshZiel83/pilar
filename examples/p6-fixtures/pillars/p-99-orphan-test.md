@@ -12,7 +12,7 @@ updated: 2026-05-02
 
 ## Strategic Rationale
 
-This pillar exists only as a fixture for exercising the P6 orphan-RS predicate (`scripts/detect-gaps.py`) and the auto-gap step of `/pilar:ingest-kb`. It deliberately contains reference statements with missing or unresolved sources so that the scan flags them and produces candidate `GAP-NNN` entries.
+This pillar exists only as a fixture for exercising the P6 orphan-RS predicate (`scripts/detect-gaps.py`) and the auto-gap step of `/pilar:ingest-sources`. It deliberately contains reference statements with missing or unresolved sources so that the scan flags them and produces candidate `GAP-NNN` entries.
 
 ## Narrative
 

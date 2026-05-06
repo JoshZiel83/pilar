@@ -154,7 +154,7 @@ Propose all entries (provisional + non-provisional) as a single block of markdow
 
 Iterate field-by-field with the user as needed. Citation, key_findings, and population are the three highest-stakes fields — never accept defaults the user has not seen and approved. The user may approve in batch ("all entries look right, proceed") or per-entry.
 
-If the user defers, **stop** without writing the manifest. The taxonomy moves from Step 6 are left in place; the user can resume by re-running `/pilar:ingest-kb` — incremental mode will pick up the still-uningested files automatically.
+If the user defers, **stop** without writing the manifest. The taxonomy moves from Step 6 are left in place; the user can resume by re-running `/pilar:ingest-sources` — incremental mode will pick up the still-uningested files automatically.
 
 ### Step 9 — Write or append to `knowledge-base/manifest.md`
 
@@ -207,7 +207,7 @@ Sequential `GAP-NNN` ids: read existing `registers/evidence-gaps.md`, find the h
 Present all proposed entries as a single block. Ask the user: *"Append these gap entries inline (commit alongside the manifest in this run) or defer (manifest commits alone; orphans will resurface next run)?"*
 
 - **Inline** → append the entries under `## Open Gaps` in `registers/evidence-gaps.md`. Use the Edit tool with `old_string` matching the section heading + any existing trailing entry text + the next-section boundary; `new_string` inserts the new entries before the `## Closed Gaps` H2. If the file currently reads `<no open gaps yet>` or similar stub text under `## Open Gaps`, replace that placeholder with the new entries. Update the frontmatter `updated:` field to today's ISO date. Validate via `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md` and correct any errors via Edits before continuing. Set `gaps_inline = N` (the count) for use in the Step 12 commit message.
-- **Defer** → leave `registers/evidence-gaps.md` untouched. Set `gaps_inline = 0`. Tell the user the same orphans will resurface the next time `/pilar:ingest-kb` runs against new files, or during `/pilar:pillar-statements` (which runs the orphan scan automatically after drafting).
+- **Defer** → leave `registers/evidence-gaps.md` untouched. Set `gaps_inline = 0`. Tell the user the same orphans will resurface the next time `/pilar:ingest-sources` runs against new files, or during `/pilar:pillar-statements` (which runs the orphan scan automatically after drafting).
 
 ### Step 12 — Propose the commit (single commit covering manifest + any inline gaps)
 
@@ -220,7 +220,7 @@ The commit message reflects both ingest mode and whether gaps were registered in
 ```
 chore(pilar): initial KB intake — N sources catalogued[, K gaps opened]
 
-Initial knowledge-base ingestion via /pilar:ingest-kb. Files
+Initial knowledge-base ingestion via /pilar:ingest-sources. Files
 categorized into the §3 default subfolder taxonomy (or user-approved
 extensions); each source has a manifest entry per §7.4 with
 user-confirmed citation, type, design, population, key_findings,
@@ -233,7 +233,7 @@ K evidence gap(s) opened inline from the post-ingest orphan-RS scan.]
 ```
 chore(pilar): KB intake — N new source(s) added (M total)[, K gaps opened]
 
-Incremental knowledge-base ingestion via /pilar:ingest-kb. New
+Incremental knowledge-base ingestion via /pilar:ingest-sources. New
 sources appended under existing taxonomy with user-confirmed
 metadata per §7.4.[
 K evidence gap(s) opened inline from the post-ingest orphan-RS scan.]
@@ -261,6 +261,6 @@ Tell the user (substituting `N` ingested sources, `M` total in manifest, and `K`
 
 > ✓ N source(s) ingested. `knowledge-base/manifest.md` now contains M entries; files organized under the approved subfolder taxonomy. K evidence gap(s) opened in this run.
 >
-> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-kb` — incremental ingestion + an orphan-RS scan run automatically. After a pillar is drafted or updated, the orphan scan also runs inside `/pilar:pillar-statements` (Step 8) — so day-to-day orphan detection is built into the drafting workflow. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
+> Drop additional sources into `knowledge-base/` at any time and re-run `/pilar:ingest-sources` — incremental ingestion + an orphan-RS scan run automatically. After a pillar is drafted or updated, the orphan scan also runs inside `/pilar:pillar-statements` (Step 8) — so day-to-day orphan detection is built into the drafting workflow. To register an aspirational statement (a strategically important claim that current evidence cannot fully support), use `/pilar:add-aspirational`.
 
 Stop.

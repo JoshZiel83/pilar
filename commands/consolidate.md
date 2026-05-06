@@ -45,7 +45,7 @@ If the script reports orphan-RS findings within any approved pillar, surface the
 
 > The following approved pillars have unresolved orphan-RS findings: `<list>`. Consolidating ships a deliverable view that contains unsupported reference statements. Proceed anyway? [y/N]
 
-On anything other than `y`, **stop** — recommend the user close the gaps via `/pilar:ingest-kb` (Step 12 walks the user through gap creation) or revise the affected RS to remove the orphan.
+On anything other than `y`, **stop** — recommend the user close the gaps via `/pilar:ingest-sources` (Step 11 walks the user through gap creation) or revise the affected RS to remove the orphan.
 
 If the audit finds no orphan-RS within the approved pillars, **proceed silently**.
 

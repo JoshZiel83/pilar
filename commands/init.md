@@ -66,7 +66,7 @@ Note on `explorations/`: this directory holds optional per-pillar exploration no
 
 Note on `consolidated/`: this directory holds assembled `consolidated/cd-NNN.md` whole-deliverable views produced by `/pilar:consolidate` (P8). Each `cd-NNN` is a `consolidated-draft` artifact (`schemas/consolidated-draft.md`) that the whole-deliverable review (`/pilar:run-qc --consolidated`) operates on. The directory is committed (with `.gitkeep`) so the first `/pilar:consolidate` invocation has a stable target.
 
-Note on `knowledge-base/for_ingestion/`: this is a **convenience staging folder** for new sources awaiting `/pilar:ingest-kb`. Both `/pilar:research` (which writes provisional sources from PubMed and ClinicalTrials.gov) and the writer (who can drop new PDFs/text files here manually) use it. `/pilar:ingest-kb` continues to scan all of `knowledge-base/` for new files — `for_ingestion/` is recommended, not required. During ingestion, files are moved to the appropriate taxonomy subfolder (`clinical/`, `preclinical/`, etc.), so `for_ingestion/` ends empty after each ingest run.
+Note on `knowledge-base/for_ingestion/`: this is a **convenience staging folder** for new sources awaiting `/pilar:ingest-sources`. Both `/pilar:research` (which writes provisional sources from PubMed and ClinicalTrials.gov) and the writer (who can drop new PDFs/text files here manually) use it. `/pilar:ingest-sources` continues to scan all of `knowledge-base/` for new files — `for_ingestion/` is recommended, not required. During ingestion, files are moved to the appropriate taxonomy subfolder (`clinical/`, `preclinical/`, etc.), so `for_ingestion/` ends empty after each ingest run.
 
 ### Step 4 — Intake interview
 
@@ -197,8 +197,8 @@ Sprint engine:
 
 KB and research:
 
-- `/pilar:ingest-kb` — auto-detected initial-intake or incremental ingestion of `knowledge-base/`. Walks new files (drop them anywhere under `knowledge-base/`; `for_ingestion/` is the recommended drop point), proposes taxonomy + manifest entries, runs the orphan-RS scan after ingest.
-- `/pilar:research "<instruction>"` — targeted PubMed and ClinicalTrials.gov search via MCP. Saves kept hits as provisional KB sources under `knowledge-base/for_ingestion/`. Run `/pilar:ingest-kb` afterward to file them as manifest entries at `status: provisional`. Requires the **PubMed** and **Clinical Trials** Claude.ai connectors enabled. Includes a `--verify` mode for drift detection on saved provisional content.
+- `/pilar:ingest-sources` — auto-detected initial-intake or incremental ingestion of `knowledge-base/`. Walks new files (drop them anywhere under `knowledge-base/`; `for_ingestion/` is the recommended drop point), proposes taxonomy + manifest entries, runs the orphan-RS scan after ingest.
+- `/pilar:research "<instruction>"` — targeted PubMed and ClinicalTrials.gov search via MCP. Saves kept hits as provisional KB sources under `knowledge-base/for_ingestion/`. Run `/pilar:ingest-sources` afterward to file them as manifest entries at `status: provisional`. Requires the **PubMed** and **Clinical Trials** Claude.ai connectors enabled. Includes a `--verify` mode for drift detection on saved provisional content.
 - `/pilar:add-aspirational <composite-id>` — register an §7.7 aspirational statement against a pillar/SS/RS.
 
 Per-pillar drafting:

@@ -54,12 +54,12 @@ Expected output: `Validated 4 file(s); 0 error(s)`. Note that the orphan pillar 
 
 ### End-to-end exercise of the slash commands
 
-These fixtures cannot be exercised against the live `/pilar:ingest-kb` and `/pilar:add-aspirational` commands without copying them into a fresh pilar engagement repo (those commands assume the engagement-repo cwd shape). To do that:
+These fixtures cannot be exercised against the live `/pilar:ingest-sources` and `/pilar:add-aspirational` commands without copying them into a fresh pilar engagement repo (those commands assume the engagement-repo cwd shape). To do that:
 
 1. From a scratch directory, run `/pilar:init` to scaffold a new engagement.
 2. Copy the contents of this fixture's `knowledge-base/clinical/`, `competitor/`, and `guidelines/` source files into the corresponding subfolders of the scratch engagement's `knowledge-base/` (without copying `manifest.md`).
 3. Copy `pillars/p-99-orphan-test.md` into the scratch engagement's `pillars/`.
-4. Run `/pilar:ingest-kb` — confirm it proposes the same 3 manifest entries (or close), produces a manifest matching the structure of this fixture's `knowledge-base/manifest.md`, then runs the auto-gap scan and proposes the 2 orphans seen above.
+4. Run `/pilar:ingest-sources` — confirm it proposes the same 3 manifest entries (or close), produces a manifest matching the structure of this fixture's `knowledge-base/manifest.md`, then runs the auto-gap scan and proposes the 2 orphans seen above.
 5. Run `/pilar:add-aspirational P-99.SS-01` — confirm the walkthrough captures the §7.7 fields and produces an entry similar to this fixture's `registers/aspirational-statements.md`.
 
 This is an interactive smoke test; not part of CI. The static gates (`schema-validate`, `context-audit`, `plugin-validate`) continue to enforce baseline correctness on every PR.

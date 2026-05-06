@@ -9,7 +9,7 @@ in `registers/evidence-gaps.md` — when any of the following is true:
   * its `sources: [<ref-id>, ...]` list cites one or more ref-ids that
     do not exist in `knowledge-base/manifest.md`.
 
-This script is the orphan-RS predicate that `/pilar:ingest-kb` invokes to
+This script is the orphan-RS predicate that `/pilar:ingest-sources` invokes to
 propose `GAP-NNN` candidates after manifest changes. It is also runnable
 ad-hoc to scan pillars without ingesting:
 

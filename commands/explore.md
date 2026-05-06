@@ -20,7 +20,7 @@ Run:
 
 !`pwd && ls -1 roadmap.md briefing.md knowledge-base/manifest.md 2>&1 | head -5`
 
-If `roadmap.md` is missing, **stop** and recommend `/pilar:init`. If `knowledge-base/manifest.md` is missing or has zero `### <ref-id>` entries, **stop** and recommend `/pilar:ingest-kb` first — without sources in the manifest there is nothing to read.
+If `roadmap.md` is missing, **stop** and recommend `/pilar:init`. If `knowledge-base/manifest.md` is missing or has zero `### <ref-id>` entries, **stop** and recommend `/pilar:ingest-sources` first — without sources in the manifest there is nothing to read.
 
 Parse `$ARGUMENTS`:
 

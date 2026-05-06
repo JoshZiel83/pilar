@@ -6,7 +6,7 @@ argument-hint: <pillar-id>
 
 Draft the `## Scientific Statements` section of one pillar (per §7.5 / §6.5): SS-NN entries (each with `status`, dates, statement paragraph, strategic argument) and the nested RS-NN entries under each SS (each with `status`, `sources: [<ref-id>, …]`, dates, free-text reference statement). Refuses unless the pillar is at `narrative-approved` (or higher, for additive runs). Decomposes the approved narrative into a full SS slate, walks the writer through one macro review of the slate, persists the SS slate to the pillar file, drafts RS into the file under each SS, then walks one macro review of the SS+RS pairs against the persisted file. Each RS picks sources from `knowledge-base/manifest.md` entries; no ref-ids are invented. Append-only IDs per `docs/CONVENTIONS.md` (highest existing + 1; never reuses retired ids — relevant on rewind).
 
-After drafting, runs `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py` against the pillar to flag orphan RS — those whose sources are missing, empty, or cite ref-ids not in the manifest. Surfaces orphans for inline `GAP-NNN` drafting (mirroring `/pilar:ingest-kb` Step 12) or defers to a follow-up `/pilar:ingest-kb` invocation.
+After drafting, runs `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py` against the pillar to flag orphan RS — those whose sources are missing, empty, or cite ref-ids not in the manifest. Surfaces orphans for inline `GAP-NNN` drafting (mirroring `/pilar:ingest-sources` Step 11) or defers to a follow-up `/pilar:ingest-sources` invocation.
 
 Asks at the end whether to mark the pillar's `status` as `statements-approved`. Proposes the commit and waits for explicit user approval before committing — per decision #4.
 
@@ -24,7 +24,7 @@ Run:
 
 !`pwd && ls -1 roadmap.md briefing.md knowledge-base/manifest.md 2>&1 | head -5`
 
-If `roadmap.md` or `knowledge-base/manifest.md` is missing, **stop** with the relevant recommendation. Without a populated manifest, RS sources cannot be picked from the KB — recommend `/pilar:ingest-kb` first if the manifest has zero entries.
+If `roadmap.md` or `knowledge-base/manifest.md` is missing, **stop** with the relevant recommendation. Without a populated manifest, RS sources cannot be picked from the KB — recommend `/pilar:ingest-sources` first if the manifest has zero entries.
 
 Parse `$ARGUMENTS` (must match `^P-\d{2}$`). Stop with usage if missing/malformed:
 
@@ -124,14 +124,14 @@ Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py <pillar_path> knowledg
 
 Parse the JSON. If `orphan_count` is 0, proceed silently to Step 9.
 
-If orphans surfaced, present them to the user. For each orphan, draft a candidate `GAP-NNN` per `schemas/evidence-gaps.md` (mirroring `/pilar:ingest-kb` Step 12 — `linked_to`, `description`, `evidence_type_needed`, `proposed_search` from briefing/audience context, `status: open`, `opened: <today>`).
+If orphans surfaced, present them to the user. For each orphan, draft a candidate `GAP-NNN` per `schemas/evidence-gaps.md` (mirroring `/pilar:ingest-sources` Step 11 — `linked_to`, `description`, `evidence_type_needed`, `proposed_search` from briefing/audience context, `status: open`, `opened: <today>`).
 
 Compute next `GAP-NNN` from `registers/evidence-gaps.md` (highest existing + 1 zero-padded to three digits; append-only).
 
-Ask the user: *"Append these gap entries inline (commit alongside the pillar) or defer to a follow-up `/pilar:ingest-kb` (which will re-detect them)?"*
+Ask the user: *"Append these gap entries inline (commit alongside the pillar) or defer to a follow-up `/pilar:ingest-sources` (which will re-detect them)?"*
 
 - **Inline** → Edit `registers/evidence-gaps.md` to append the gaps under `## Open Gaps`. Update its frontmatter `updated:`. Validate via !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`.
-- **Defer** → leave `registers/evidence-gaps.md` untouched; the orphans will resurface the next time `/pilar:ingest-kb` runs against new files or the next time this pillar (or another) is drafted via `/pilar:pillar-statements`.
+- **Defer** → leave `registers/evidence-gaps.md` untouched; the orphans will resurface the next time `/pilar:ingest-sources` runs against new files or the next time this pillar (or another) is drafted via `/pilar:pillar-statements`.
 
 ### Step 8 — Approve commit (status flip + commit in one gate)
 
