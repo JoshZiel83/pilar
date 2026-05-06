@@ -173,7 +173,7 @@ If `yes`:
    - `knowledge-base/for_ingestion/pmid-NNNN.md`
    - `knowledge-base/for_ingestion/nct-NNNNNNNN.md`
 
-   **Hand-off:** run `/pilar:ingest-kb` to file these as manifest entries at `status: provisional`.
+   **Hand-off:** run `/pilar:ingest-sources` to file these as manifest entries at `status: provisional`.
    ```
 
 5. Check whether `explorations/<pillar_id>.md` exists:
@@ -193,7 +193,7 @@ docs(pilar): research — N provisional KB source(s) staged
 Targeted research via /pilar:research. Provisional source files
 written to knowledge-base/for_ingestion/ via
 scripts/research-fetch.py (deterministic; no LLM in canonical
-bytes per issue #11). Run /pilar:ingest-kb next to file them as
+bytes per issue #11). Run /pilar:ingest-sources next to file them as
 manifest entries with status: provisional.
 ```
 
@@ -219,7 +219,7 @@ Tell the writer (substituting `N` = number of provisional sources staged):
 >
 > Next:
 >
-> - Run `/pilar:ingest-kb`. It will move the staged files to the appropriate taxonomy subfolder (`clinical/`, etc.), pre-fill manifest metadata from each file's frontmatter, ask you only to confirm `key_findings`, and add manifest entries at `status: provisional`.
+> - Run `/pilar:ingest-sources`. It will move the staged files to the appropriate taxonomy subfolder (`clinical/`, etc.), pre-fill manifest metadata from each file's frontmatter, ask you only to confirm `key_findings`, and add manifest entries at `status: provisional`.
 > - Cite the new entries in RS work as needed; they're real manifest entries, just flagged provisional until full text arrives.
 > - When the full PDF/source arrives: drop it into the appropriate `knowledge-base/<subfolder>/`, update the entry's `file:` and `status:` fields, and the entry becomes confirmed.
 > - To check whether provisional content has drifted vs. upstream:
