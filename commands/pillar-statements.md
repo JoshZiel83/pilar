@@ -18,7 +18,7 @@ Like `/pilar:pillar-narrative`, this command does **not** auto-invoke `/pilar:ru
 
 ## Procedure
 
-### Step 1 — Confirm engagement, parse argument, locate pillar
+### Step 1 — Detect engagement state, parse argument, locate pillar
 
 Run:
 

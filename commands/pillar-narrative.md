@@ -14,7 +14,7 @@ This command does **not** invoke `/pilar:run-qc` automatically. Editor engagemen
 
 ## Procedure
 
-### Step 1 — Confirm engagement and parse the argument
+### Step 1 — Detect engagement state and parse the argument
 
 Run:
 

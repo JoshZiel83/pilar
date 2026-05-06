@@ -13,7 +13,7 @@ This command is typically run **once per engagement** at the close of the briefi
 
 ## Procedure
 
-### Step 1 — Confirm we are in a pilar engagement
+### Step 1 — Detect engagement state
 
 Run:
 

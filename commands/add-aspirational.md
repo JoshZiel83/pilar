@@ -12,7 +12,7 @@ Register an aspirational statement (§6.5, §7.7) — a strategically important 
 
 ## Procedure
 
-### Step 1 — Confirm we are in a pilar engagement and parse the argument
+### Step 1 — Detect engagement state and parse the argument
 
 Run:
 

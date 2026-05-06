@@ -11,7 +11,7 @@ The consolidated draft is the input to `/pilar:run-qc --consolidated`, which run
 
 ## Procedure
 
-### Step 1 — Confirm engagement state
+### Step 1 — Detect engagement state
 
 Run:
 

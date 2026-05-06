@@ -14,7 +14,7 @@ The command is **bounded by user direction**: the user picks the angle, and the 
 
 ## Procedure
 
-### Step 1 — Confirm engagement and parse argument
+### Step 1 — Detect engagement state and parse argument
 
 Run:
 

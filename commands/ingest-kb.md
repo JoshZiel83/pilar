@@ -17,7 +17,7 @@ The Librarian role (§4.2) has no QC-style independence contract — the Primary
 
 ## Procedure
 
-### Step 1 — Confirm we are in a pilar engagement
+### Step 1 — Detect engagement state
 
 Run:
 

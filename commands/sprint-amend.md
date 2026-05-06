@@ -7,7 +7,7 @@ Amend the in-flight pilar sprint plan. Per §5.2: "If during execution the user 
 
 ## Procedure
 
-### Step 1 — Confirm an active sprint exists
+### Step 1 — Detect active sprint
 
 Run:
 

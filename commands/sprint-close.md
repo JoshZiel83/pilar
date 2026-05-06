@@ -11,7 +11,7 @@ Close the active pilar sprint. Drafts the sprint summary from work actually comp
 
 ## Procedure
 
-### Step 1 — Confirm an active sprint exists
+### Step 1 — Detect active sprint
 
 Run:
 
