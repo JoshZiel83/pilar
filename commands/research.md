@@ -19,7 +19,7 @@ The user types either a natural-language instruction ("studies of our drug in el
 
 ## Procedure
 
-### Step 1 — Confirm engagement and parse argument
+### Step 1 — Detect engagement state and parse argument
 
 Run:
 

@@ -11,7 +11,7 @@ Open a new sprint in the current pilar engagement. Drafts a sprint plan from the
 
 ## Procedure
 
-### Step 1 — Confirm we are in a pilar engagement
+### Step 1 — Detect engagement state
 
 Run:
 

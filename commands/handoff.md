@@ -11,7 +11,7 @@ This command does not auto-tag. The git tag is the engagement's handoff record a
 
 ## Procedure
 
-### Step 1 — Confirm engagement state
+### Step 1 — Detect engagement state
 
 Run:
 
@@ -83,53 +83,43 @@ Capture today's ISO date via `!date +%F`. Read `roadmap.md`. Make these targeted
 
 Do **not** edit `## Sprint History` — handoff is a ceremonial step after the final WDR sprint closes, not a sprint itself. Sprint History remains sprints-only.
 
-### Step 6 — Propose the final commit
+### Step 6 — Authorize handoff (one prompt: commit + tag)
 
-Run `!git status` to show the user the staged/unstaged changes. Propose:
+Run `!git status` to show the staged/unstaged roadmap changes.
 
-```
-chore(pilar): handoff — consolidated draft <cd-id> delivered
-
-Engagement complete per §6.9. Roadmap Status set to terminal narrative;
-Decisions Log records the handoff date and the delivered consolidated
-draft. The whole-deliverable review for <cd-id> cleared (Editor,
-Fact-Checker, Strategic Reviewer per §6.8); high-severity findings
-addressed in follow-up sprints and confirmed by the user at handoff.
-```
-
-Wait for explicit user approval. On approval:
-
-```bash
-git add roadmap.md
-git commit -m "..."  # heredoc with the approved message
-```
-
-If the user wants to revise the message, accept their version. If the user defers the commit, **stop without committing AND without proposing the tag** — do not tag against an uncommitted state.
-
-### Step 7 — Propose the engagement handoff tag (explicit user authorization required)
-
-Per the saved release-gating policy applied analogously to engagement tags: never tag without explicit per-tag user authorization for that specific tag.
-
-Run `!git rev-parse HEAD` to capture the commit SHA the tag would point at. Propose:
+Propose the commit message and the tag together as a single handoff authorization. The tag is intentionally bundled here because it points at the commit this step creates — separating the two prompts asked the user to authorize the same engagement-close decision twice.
 
 ```
+HANDOFF AUTHORIZATION
+
+Commit message:
+  chore(pilar): handoff — consolidated draft <cd-id> delivered
+
+  Engagement complete per §6.9. Roadmap Status set to terminal narrative;
+  Decisions Log records the handoff date and the delivered consolidated
+  draft. The whole-deliverable review for <cd-id> cleared (Editor,
+  Fact-Checker, Strategic Reviewer per §6.8); high-severity findings
+  addressed in follow-up sprints and confirmed by the user at handoff.
+
 Tag name (default): engagement-handoff-<today's date>-<cd-id>
 Tag message:        Engagement handoff. Consolidated draft <cd-id> delivered on <today's date> after clearing whole-deliverable review per §6.8.
-Tagged commit:      <short-sha> (from Step 6)
 
-Authorize tag 'engagement-handoff-<today's date>-<cd-id>'? [y/N]
+Authorize the handoff (commit roadmap.md AND tag the resulting commit)? [y/N]
+   (or: 'revise commit: <new message>' / 'revise tag: <new name>' / 'commit only' / 'defer')
 ```
 
-Wait for `y` (case-sensitive — anything else does not authorize).
+Wait for the user's response.
 
-- On `y`: run `!git tag -a engagement-handoff-<today's date>-<cd-id> -m "<tag message>"`. Confirm with `!git tag -l "engagement-handoff-*"` and report the new tag to the user. Do not push — pushing tags is a separate user action.
-- On anything other than `y`: do not tag. Report:
+- **`y`** (case-sensitive) → in order:
+  1. `git add roadmap.md && git commit -m "<approved message>"` (heredoc with the approved message).
+  2. `git rev-parse HEAD` to capture the new commit SHA.
+  3. `git tag -a <approved tag name> -m "<approved tag message>"`.
+  4. Confirm with `git tag -l "engagement-handoff-*"`. Do not push — pushing the commit and tag is a separate user action.
+- **`revise commit: …` / `revise tag: …`** → take the new text, restate the prompt with the substitution, wait for `y`.
+- **`commit only`** → run the commit (step 1 above) but skip the tag. Report the manual command for tagging later: `git tag -a engagement-handoff-<today's date>-<cd-id> -m "Engagement handoff. Consolidated draft <cd-id> delivered on <today's date>."` Engagement-close commit is in place; tag is the user's call to make later.
+- **`defer`** (or anything other than the above) → **stop without committing AND without tagging.** The roadmap edit remains in the working tree.
 
-  > Tag not created. To create later, run: `git tag -a engagement-handoff-<today's date>-<cd-id> -m "Engagement handoff. Consolidated draft <cd-id> delivered on <today's date>."`
-
-If the user proposes a different tag name, accept it (still requires explicit `y` after restating the proposal).
-
-### Step 8 — Brief the user on next steps
+### Step 7 — Brief the user on next steps
 
 Tell the user:
 

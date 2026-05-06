@@ -13,7 +13,7 @@ This command is typically run **once per engagement** at the close of the briefi
 
 ## Procedure
 
-### Step 1 — Confirm we are in a pilar engagement
+### Step 1 — Detect engagement state
 
 Run:
 
@@ -61,22 +61,13 @@ Propose adjustments to the default set if the briefing motivates them:
 - If the lifecycle stage is post-launch (real-world data dominate), consider an "Effectiveness in routine practice" pillar.
 - Other adjustments drawn directly from the briefing's competitive context, constraints, or evidence-generation activities.
 
-### Step 5 — Iterate with the user
+### Step 5 — Iterate with the user, settle the set
 
 Present the proposed set as a numbered list with each pillar's name and rationale. Ask the user for refinements: rename a pillar, add one, drop one, reorder, merge, split. Iterate briefly — one or two short rounds — until the user is satisfied.
 
-When the order is settled, that order determines `P-NN` assignment: first proposed pillar becomes `P-01`, second becomes `P-02`, etc. Confirm the user is happy with the order before generating ids.
+The list order **deterministically** assigns ids and slugs: first pillar becomes `P-01`, second becomes `P-02`, etc.; each pillar's slug is the kebab-case form of its name (lowercase ASCII alphanumerics + hyphens; collapse internal whitespace; strip leading/trailing hyphens). When you present the proposal include the resulting `P-NN` and slug in line with each pillar so the user sees the consequence of order/name changes as they refine. The user can override any slug inline (the slug becomes part of the filename); no separate id/slug-confirmation gate after the set settles.
 
-### Step 6 — Generate P-NN ids and slugs
-
-For each approved pillar (in the user-confirmed order):
-
-- `pillar_id` = `P-NN` zero-padded to two digits.
-- `slug` = a kebab-case form of the pillar name (e.g., `Clinical Value Framework` → `clinical-value-framework`; lowercase ASCII alphanumerics + hyphens; collapse internal whitespace; strip leading/trailing hyphens).
-
-Show the user the final id-and-slug list one more time. If they want to adjust a slug, accept it (the slug becomes part of the filename).
-
-### Step 7 — Write one stub pillar file per approved pillar
+### Step 6 — Write one stub pillar file per approved pillar
 
 Capture today's ISO date with `!date +%F`.
 
@@ -118,7 +109,7 @@ _None yet._
 
 Use the Write tool — these are new files.
 
-### Step 8 — Update `roadmap.md`'s `## Pillars` section
+### Step 7 — Update `roadmap.md`'s `## Pillars` section
 
 Replace the current `## Pillars` section body (typically `(none yet)` or a placeholder table after `/pilar:init`) with a populated markdown table:
 
@@ -134,7 +125,7 @@ Replace the current `## Pillars` section body (typically `(none yet)` or a place
 
 Use the Edit tool with `old_string` matching the existing `## Pillars` section and `new_string` containing the populated table. Update frontmatter `updated:` to today via a separate Edit.
 
-### Step 9 — Validate
+### Step 8 — Validate
 
 Run:
 
@@ -144,7 +135,7 @@ Note: `scripts/validate-schemas.py`'s directory mode globs `*.md` at the top lev
 
 If validation fails, surface errors and correct via Edits before continuing.
 
-### Step 10 — Propose the commit
+### Step 9 — Propose the commit
 
 Run `git status` to show changes. Propose:
 
@@ -168,7 +159,7 @@ EOF
 
 If the user wants to revise the message, accept their version. If the user defers the commit, **stop** without committing — the files remain in the working tree.
 
-### Step 11 — Brief the user on next steps
+### Step 10 — Brief the user on next steps
 
 Tell the user:
 
