@@ -178,53 +178,15 @@ Run:
 
 If validation fails, surface the errors to the user. Correct the manifest with targeted Edits and re-validate. Do not proceed to Step 11 until validation passes.
 
-### Step 11 — Propose the commit
+### Step 11 — Auto-detect orphan reference statements (pre-commit)
 
-Run `git status` to show the staged and unstaged changes (file moves + manifest write).
-
-**In initial-intake mode**, propose this commit message (substitute the entry count `N`):
-
-```
-chore(pilar): initial KB intake — N sources catalogued
-
-Initial knowledge-base ingestion via /pilar:ingest-kb. Files
-categorized into the §3 default subfolder taxonomy (or user-approved
-extensions); each source has a manifest entry per §7.4 with
-user-confirmed citation, type, design, population, key_findings,
-and tags.
-```
-
-**In incremental mode**, propose this commit message (substitute `N` = new entries, `M` = total in manifest after append):
-
-```
-chore(pilar): KB intake — N new source(s) added (M total)
-
-Incremental knowledge-base ingestion via /pilar:ingest-kb. New
-sources appended under existing taxonomy with user-confirmed
-metadata per §7.4.
-```
-
-Wait for explicit user approval. If approved, run:
-
-```bash
-git add knowledge-base/
-git commit -m "$(cat <<'EOF'
-... approved message ...
-EOF
-)"
-```
-
-If the user wants to revise the message, accept their version. If the user defers the commit, **stop** without committing — the changes remain in the working directory.
-
-### Step 12 — Auto-detect orphan reference statements
-
-After the manifest commit lands, run the orphan-RS predicate to flag reference statements that lack support and propose `GAP-NNN` candidates. For early-sprint engagements with no pillars yet, the scan returns zero orphans and this step is a silent no-op — proceed directly to Step 13.
+Run the orphan-RS predicate **before** committing, so manifest entries and any newly-registered evidence gaps land in a single commit. For early-sprint engagements with no pillars yet, the scan returns zero orphans and this step is a silent no-op — proceed directly to Step 12.
 
 Run:
 
 !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py pillars knowledge-base/manifest.md --format json`
 
-Parse the JSON output. If `orphan_count` is 0, skip the rest of this step and proceed to Step 13. Otherwise, surface the orphans to the user as a brief summary:
+Parse the JSON output. If `orphan_count` is 0, skip the rest of this step and proceed to Step 12. Otherwise, surface the orphans to the user as a brief summary:
 
 > Found N orphan reference statement(s):
 > - P-NN.SS-NN.RS-NN — <reason>
@@ -242,29 +204,56 @@ For each orphan, draft a candidate `GAP-NNN` entry per `schemas/evidence-gaps.md
 
 Sequential `GAP-NNN` ids: read existing `registers/evidence-gaps.md`, find the highest `GAP-NNN` across both `## Open Gaps` and `## Closed Gaps` sections (`docs/CONVENTIONS.md` append-only rule), and continue from `max + 1` zero-padded to three digits.
 
-Present all proposed entries as a single block. Wait for explicit user approval. Accept per-field refinements; iterate until satisfied. If the user defers, **stop** without writing the gap entries — tell them the same orphans will resurface the next time `/pilar:ingest-kb` runs against new files, or during `/pilar:pillar-statements` (which runs the orphan scan automatically after drafting).
+Present all proposed entries as a single block. Ask the user: *"Append these gap entries inline (commit alongside the manifest in this run) or defer (manifest commits alone; orphans will resurface next run)?"*
 
-On approval, append the entries under `## Open Gaps` in `registers/evidence-gaps.md`. Use the Edit tool with `old_string` matching the section heading + any existing trailing entry text + the next-section boundary; `new_string` inserts the new entries before the `## Closed Gaps` H2. If the file currently reads `<no open gaps yet>` or similar stub text under `## Open Gaps`, replace that placeholder with the new entries. Update the frontmatter `updated:` field to today's ISO date.
+- **Inline** → append the entries under `## Open Gaps` in `registers/evidence-gaps.md`. Use the Edit tool with `old_string` matching the section heading + any existing trailing entry text + the next-section boundary; `new_string` inserts the new entries before the `## Closed Gaps` H2. If the file currently reads `<no open gaps yet>` or similar stub text under `## Open Gaps`, replace that placeholder with the new entries. Update the frontmatter `updated:` field to today's ISO date. Validate via `!python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md` and correct any errors via Edits before continuing. Set `gaps_inline = N` (the count) for use in the Step 12 commit message.
+- **Defer** → leave `registers/evidence-gaps.md` untouched. Set `gaps_inline = 0`. Tell the user the same orphans will resurface the next time `/pilar:ingest-kb` runs against new files, or during `/pilar:pillar-statements` (which runs the orphan scan automatically after drafting).
 
-Run:
+### Step 12 — Propose the commit (single commit covering manifest + any inline gaps)
 
-!`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`
+Run `git status` to show all staged/unstaged changes from this run (file moves, manifest write, optional gap-register append).
 
-If validation fails, surface errors and correct via targeted Edits before continuing.
+The commit message reflects both ingest mode and whether gaps were registered inline:
 
-Display `git status` and propose a separate commit message:
+**Initial-intake mode** (substitute entry count `N` and append the gap-suffix line if `gaps_inline > 0`):
 
 ```
-chore(pilar): N evidence gap(s) opened from orphan-RS scan
+chore(pilar): initial KB intake — N sources catalogued[, K gaps opened]
 
-Auto-detected by scripts/detect-gaps.py after KB ingest. Each
-GAP-NNN links to a reference statement whose sources are missing,
-empty, or cite ref-ids absent from the manifest. Librarian
-drafted proposed_search per orphan from briefing and audience
-context.
+Initial knowledge-base ingestion via /pilar:ingest-kb. Files
+categorized into the §3 default subfolder taxonomy (or user-approved
+extensions); each source has a manifest entry per §7.4 with
+user-confirmed citation, type, design, population, key_findings,
+and tags.[
+K evidence gap(s) opened inline from the post-ingest orphan-RS scan.]
 ```
 
-Wait for explicit user approval. On approval: `git add registers/evidence-gaps.md` and commit. If deferred, **stop** without committing — the file edits remain in the working tree.
+**Incremental mode** (substitute `N` = new entries, `M` = total in manifest, optional gap suffix):
+
+```
+chore(pilar): KB intake — N new source(s) added (M total)[, K gaps opened]
+
+Incremental knowledge-base ingestion via /pilar:ingest-kb. New
+sources appended under existing taxonomy with user-confirmed
+metadata per §7.4.[
+K evidence gap(s) opened inline from the post-ingest orphan-RS scan.]
+```
+
+(Strip the bracketed clauses if `gaps_inline == 0`.)
+
+Wait for explicit user approval. If approved:
+
+```bash
+git add knowledge-base/ [registers/evidence-gaps.md]
+git commit -m "$(cat <<'EOF'
+... approved message ...
+EOF
+)"
+```
+
+(Stage `registers/evidence-gaps.md` only when `gaps_inline > 0`.)
+
+If the user wants to revise the message, accept their version. If the user defers the commit, **stop** without committing — the changes remain in the working directory.
 
 ### Step 13 — Brief the user on next steps
 

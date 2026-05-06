@@ -59,7 +59,7 @@ Read these in full or in part as noted:
 - `knowledge-base/manifest.md` — capture every `### <ref-id>` entry's id, `type`, and `key_findings`. Group by `type` (e.g., `Single-arm Phase 2 trial: <ref-id>, <ref-id>`; `Treatment guideline: <ref-id>`) — the narrative will reference categories of evidence available, not specific manifest entries (those are in scope for `/pilar:pillar-statements`).
 - `pillars/*.md` — for each pillar file at `status` ≥ `narrative-approved` (i.e., `narrative-approved`, `statements-approved`, or `complete`), capture the pillar's name, slug, and a one-sentence summary of its `## Narrative` (the first paragraph). This grounds cross-pillar consistency: the new narrative should not duplicate or contradict already-approved framing.
 
-### Step 5 — Draft the three sections with the user
+### Step 5 — Draft the three sections with the user (lexicon proposals captured inline)
 
 The Primary Collaborator drafts in the main session — no subagent. The user reviews and refines each section.
 
@@ -71,7 +71,9 @@ The Primary Collaborator drafts in the main session — no subagent. The user re
 
 Iterate with the user. Be brief — one or two short rounds per section is the goal. The user can request rewrites at any granularity (whole-section, paragraph, sentence).
 
-### Step 6 — Write the drafted sections to the pillar file
+**Lexicon proposals are captured inline.** When the user makes a term decision during drafting (a preferred orthography, an avoid-form → preferred-form pair, a disease abbreviation), capture it in a running `lexicon_additions` list as `<avoid form> -> <preferred form>` per §6.6. Surface the running list at the end of the iteration (before persisting in Step 6) for one final user confirmation; the final lexicon write happens in Step 6 alongside the pillar edit, in the same commit. Do not run a separate lexicon-prompt step at the end — that was a co-located approval gate the user had already implicitly granted by accepting term decisions during drafting.
+
+### Step 6 — Write the drafted sections to the pillar file (and any lexicon additions)
 
 Use the Edit tool, one Edit per section. For each of the three sections, the `old_string` matches the section heading + the `_TBD_` placeholder body (or whatever is currently there if the user is continuing an in-flight draft); the `new_string` is the section heading + the drafted body.
 
@@ -87,44 +89,29 @@ _TBD — drafted in /pilar:pillar-narrative._
 
 If the existing content is something else (continuation case), match against that.
 
+If `lexicon_additions` from Step 5 is non-empty: read `lexicon.md`, draft a new entry per term per the §7.8 schema, and append at the end of the body (lexicon entries are insertion-ordered by convention; no numeric ids). Edit `lexicon.md` frontmatter `updated:` to today.
+
 ### Step 7 — Update frontmatter `updated:`
 
 Capture today's ISO date with `!date +%F`. Edit the pillar file's frontmatter `updated:` field to today.
 
 ### Step 8 — Validate
 
-Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>` (substituting the captured `<pillar_path>`).
+Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path> [lexicon.md]` (substituting the captured `<pillar_path>`; include `lexicon.md` if Step 6 edited it).
 
 If validation fails, surface errors and correct via Edits before continuing.
 
-### Step 9 — Lexicon prompt (§6.6)
+### Step 9 — Approve commit (status flip + commit in one gate)
 
-Ask the user briefly: *"Did this drafting introduce new terms that should go in the lexicon? Format: `<avoid form> -> <preferred form>` per term, comma-separated, or `none`."*
+Run `git status` to show changes (pillar file edit, possibly `lexicon.md` if Step 6 appended entries).
 
-If the user names term(s):
+Propose the commit message **and** the implied status flip in one prompt. The commit message records the status flip, so the prior pattern of asking "mark approved?" then "approve commit?" had the user authorizing the same decision twice.
 
-- Read `lexicon.md` and find the highest existing entry to preserve append-only ordering (lexicon entries don't have numeric ids — they're alphabetical or insertion-ordered by convention, so just append at the end of the body).
-- For each new term, draft a lexicon entry per the §7.8 schema. Show the user the proposed entries; confirm.
-- Edit `lexicon.md` to append the new entries. Update `lexicon.md` frontmatter `updated:` to today.
+```
+APPROVE COMMIT
 
-If the user replies `none`, skip — no lexicon edits.
-
-### Step 10 — Status-transition prompt
-
-Ask the user: *"Mark P-NN narrative as approved? — sets pillar status: draft → narrative-approved. (yes / no / defer-until-sprint-close)"*
-
-- `yes` → Edit pillar frontmatter `status: draft` → `status: narrative-approved`.
-- `no` or `defer-until-sprint-close` → leave at `draft`. The transition can happen later by re-running this command with the same pillar id (which will detect existing content as a continuation case) or by a direct frontmatter edit.
-
-### Step 11 — Propose the commit
-
-Run `git status` to show changes (pillar file edit, possibly `lexicon.md` if Step 9 added entries).
-
-Propose a mode-specific commit message:
-
-- If status moved to `narrative-approved`:
-
-  ```
+Records status flip: P-NN draft → narrative-approved
+Commit message:
   feat(pilar): P-NN narrative approved (<name>)
 
   Pillar narrative drafted; Strategic Rationale, Narrative, and Scope
@@ -132,36 +119,17 @@ Propose a mode-specific commit message:
   consistency check. Status moved draft → narrative-approved.
   Next: /pilar:run-qc <pillar-path> for Editor engagement;
   /pilar:pillar-statements P-NN once Editor pass clears.
-  ```
 
-  Append `; lexicon: <comma-separated terms>` if Step 9 added entries.
+  (Append "; lexicon: <terms>" if Step 6 appended lexicon entries.)
 
-- If status remains `draft`:
-
-  ```
-  feat(pilar): P-NN narrative drafted (<name>)
-
-  Pillar narrative drafted but not yet approved. Status remains
-  draft pending Editor pass and user approval. Re-run
-  /pilar:pillar-narrative P-NN to refine and mark
-  narrative-approved when ready.
-  ```
-
-  Append `; lexicon: <terms>` if entries were added.
-
-Wait for explicit user approval. On approval:
-
-```bash
-git add pillars/<pillar-file> [lexicon.md]
-git commit -m "$(cat <<'EOF'
-... approved message ...
-EOF
-)"
+Reply: approve / revise message: <new> / defer (leave status at draft, do not commit)
 ```
 
-If the user revises the message, accept it. If the user defers the commit, **stop** without committing — the working tree retains the edits.
+- **`approve`** → Edit the pillar frontmatter `status: draft` → `status: narrative-approved`. Then `git add pillars/<pillar-file> [lexicon.md] && git commit -m "<approved message>"`.
+- **`revise message: <new>`** → use the new message; restate the prompt with the substitution; wait for `approve`.
+- **`defer`** (or anything else) → leave `status: draft`. Do not commit. The working tree retains the edits; the writer can re-run the command later (continuation case) or commit by hand. The `defer-until-sprint-close` semantic is preserved by this branch.
 
-### Step 12 — Brief the user on next steps
+### Step 10 — Brief the user on next steps
 
 Tell the user (substituting):
 

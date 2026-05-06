@@ -55,14 +55,16 @@ Body sections populated:
 
 ### Step 4 — Present at the checkpoint and ask the user
 
-Present the drafted summary. Ask the user to choose one of:
+Present the drafted summary. The user's response at this step **also authorizes the close-commit** for the chosen branch — the close-commit message records the same decision the user is making here, so the prior pattern of asking again on the commit message had the user approving the same thing twice. The branch-execution step (Step 5) stages the edits, shows the proposed commit message, and commits without re-asking unless the user opts to revise or abort.
 
 > Sprint <N> checkpoint. Respond with one of:
 >
-> - **Confirm.** The sprint closes. The summary stands; we update the roadmap and propose the next sprint.
-> - **Request revisions.** You provide feedback. If the additional work is bounded (small in-scope adjustments), we amend the plan and continue executing. If the work is substantive, we record the items in next-sprint scope and close this sprint.
-> - **Defer.** The work is parked pending external input (e.g. evidence enlargement, client decision). Deferred items go into Open Items.
-> - **Rewind.** Earlier-approved work needs to be reopened. We plan a new sprint with that scope; the reopen is recorded in the roadmap's Decisions Log.
+> - **Confirm.** The sprint closes. The summary stands; the roadmap is updated; the close-commit is made.
+> - **Request revisions.** You provide feedback. If bounded (small in-scope adjustments), we amend the plan and continue executing — *no commit*. If substantive, the items are recorded in next-sprint scope and the close-commit is made.
+> - **Defer.** Work parked pending external input (e.g. evidence enlargement, client decision). Deferred items go into Open Items; the close-commit is made.
+> - **Rewind.** Earlier-approved work reopened. A new sprint will tackle that scope; the reopen is recorded in the roadmap's Decisions Log; the close-commit is made.
+>
+> (You can append `revise commit: <new message>` after your branch choice if you want to override the proposed message before the commit lands. To abort the close after seeing the staged edits, reply `abort`.)
 
 Wait for the user's choice.
 
@@ -72,13 +74,13 @@ Wait for the user's choice.
 
 1. Capture the user's verbatim feedback (if any) and write it to the summary's "## Human Response" section under a `confirmed —` prefix. If no feedback was provided, use `confirmed.` alone.
 2. Edit the summary's frontmatter `human_response:` from `pending` to `confirmed`.
-3. Update `roadmap.md` with three targeted edits (show diff before commit):
+3. Update `roadmap.md` with these targeted edits:
    - Frontmatter `updated:` → today's ISO date.
    - "## Sprint History" → append a line `- Sprint <N>: <one-line work summary> ([summary](sprints/sprint-<NN>/summary.md))`.
    - "## Active Workstreams" → remove the Sprint <N> entry added by `/pilar:sprint-plan`.
    - "## Next Sprint Scope" → replace its body with the summary's "Next Sprint Proposed Scope" content.
    - "## Status" → update narrative to reflect new state.
-4. Propose the commit:
+4. Show the diff (`git diff sprints/sprint-NN/summary.md roadmap.md`) and the proposed commit message:
 
    ```
    chore(pilar): close sprint <N> (confirmed) — <one-line work summary>
@@ -89,7 +91,7 @@ Wait for the user's choice.
    Next Sprint Proposed Scope.
    ```
 
-5. Wait for approval; on approval, `git add sprints/sprint-NN/summary.md roadmap.md && git commit -m "..."`.
+5. The user's `Confirm` choice in Step 4 is the close-commit authorization. Run `git add sprints/sprint-NN/summary.md roadmap.md && git commit -m "..."` directly. If the user asked for `revise commit: …` alongside the choice, use that message. If the user replied `abort` after seeing the staged edits in this step, leave the working tree dirty and stop without committing.
 6. Tell the user: "✓ Sprint <N> closed. Run `/pilar:sprint-plan` when ready to open Sprint <N+1>."
 
 #### Branch B — Request revisions
@@ -107,7 +109,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
 1. Capture the user's verbatim feedback and append to the summary's "## Next Sprint Proposed Scope" with a `(carried from Sprint <N> revisions request)` annotation on the new items.
 2. Edit summary frontmatter `human_response:` → `confirmed`. Write a Human Response body of `confirmed with revisions deferred to Sprint <N+1>: <verbatim feedback>`.
 3. Update roadmap as in Branch A (Sprint History entry notes "(revisions deferred to next sprint)"; Active Workstreams cleared; Next Sprint Scope absorbs the deferred items).
-4. Propose commit:
+4. Show the diff and the proposed commit message:
 
    ```
    chore(pilar): close sprint <N> (revisions deferred) — <one-line summary>
@@ -118,7 +120,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
    Sprint Scope.
    ```
 
-5. Same approval/commit flow as Branch A.
+5. The user's `Revisions (substantive)` choice in Step 4 is the close-commit authorization. Run the commit (Branch A's commit pattern). Honor `revise commit: …` and `abort` per Branch A.
 
 #### Branch C — Defer
 
@@ -130,7 +132,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
    - Sprint History entry: `- Sprint <N>: <work summary> (deferred — awaiting <reason>) ([summary](...))`.
    - Active Workstreams: remove Sprint <N>; add a `Deferred:` sub-list referencing the deferred items.
    - Next Sprint Scope: append deferred items so they aren't lost when external input arrives.
-5. Propose commit:
+5. Show the diff and the proposed commit message:
 
    ```
    chore(pilar): close sprint <N> (deferred) — awaiting <reason>
@@ -140,7 +142,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
    Sprint Scope; awaiting <reason> before continuation.
    ```
 
-6. Same approval/commit flow as Branch A.
+6. The user's `Defer` choice in Step 4 is the close-commit authorization. Run the commit (Branch A pattern). Honor `revise commit: …` and `abort` per Branch A.
 7. Tell the user: "✓ Sprint <N> deferred. When <reason> resolves, run `/pilar:sprint-plan` to open the continuation sprint."
 
 #### Branch D — Rewind
@@ -154,7 +156,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
    - Active Workstreams: remove Sprint <N>; add the rewind scope as a planned Sprint <N+1> entry.
    - Next Sprint Scope: replace with the rewind scope (this is what the next sprint will tackle).
    - **Decisions Log** (this is mandatory for rewind): append a row like `| <today> | Rewind: reopen <scope> from Sprint <prior-N> | <user's rationale> | Sprint <N> → <N+1>, §6.5 |`.
-5. Propose commit:
+5. Show the diff and the proposed commit message:
 
    ```
    chore(pilar): close sprint <N> (rewind) — reopen <scope summary>
@@ -166,7 +168,7 @@ Ask: "Are these revisions bounded (small adjustments inside the current sprint s
    append-only rule.
    ```
 
-6. Same approval/commit flow as Branch A.
+6. The user's `Rewind` choice in Step 4 is the close-commit authorization. Run the commit (Branch A pattern). Honor `revise commit: …` and `abort` per Branch A.
 7. Tell the user: "✓ Sprint <N> closed with rewind. Run `/pilar:sprint-plan` to open Sprint <N+1> against the reopened scope."
 
 ### Step 6 — If the chosen branch did not commit (Branch B1)

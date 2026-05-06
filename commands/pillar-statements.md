@@ -111,62 +111,39 @@ Ask the user: *"Append these gap entries inline (commit alongside the pillar) or
 - **Inline** → Edit `registers/evidence-gaps.md` to append the gaps under `## Open Gaps`. Update its frontmatter `updated:`. Validate via !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`.
 - **Defer** → leave `registers/evidence-gaps.md` untouched; the orphans will resurface the next time `/pilar:ingest-kb` runs against new files or the next time this pillar (or another) is drafted via `/pilar:pillar-statements`.
 
-### Step 9 — Lexicon prompt (§6.6)
+### Step 9 — Approve commit (status flip + commit in one gate)
 
-Same as `/pilar:pillar-narrative` Step 9. SS/RS drafting often introduces precise scientific terminology that benefits from lexicon entries (e.g., a preferred orthography for a disease abbreviation, or an avoid form like "drug X cures Y" → "drug X demonstrates clinical activity in Y").
+Run `git status` to show changes (pillar file, optionally `lexicon.md` if lexicon additions were captured during drafting iteration, optionally `registers/evidence-gaps.md` from Step 8 inline-gap branch).
 
-### Step 10 — Status-transition prompt
+Lexicon proposals are captured **inline during drafting** (same pattern as `/pilar:pillar-narrative` Step 5): when the user accepts a term decision in iteration, the proposal accumulates in a running `lexicon_additions` list; the actual lexicon write happens in Step 5's persistence step (or in a sub-step of the decompose-first restructure, when that lands). No dedicated lexicon-prompt step at the end — the user's term decisions during drafting *are* the approval.
 
-Ask: *"Mark P-NN statements as approved? — sets pillar status: narrative-approved → statements-approved. (yes / no / defer-until-sprint-close)"*
+Propose the commit message **and** the implied status flip in one prompt. The commit message records the status flip, so the prior pattern of asking "mark approved?" then "approve commit?" had the user authorizing the same decision twice.
 
-- `yes` → Edit pillar frontmatter `status` to `statements-approved`.
-- `no` / `defer-until-sprint-close` → leave at `narrative-approved`. Re-running this command later (additive case) is allowed; the transition can also happen via direct frontmatter edit.
+```
+APPROVE COMMIT
 
-### Step 11 — Propose the commit
-
-Run `git status` to show changes (pillar file, optionally `lexicon.md`, optionally `registers/evidence-gaps.md`).
-
-Mode-specific commit message:
-
-- If status moved to `statements-approved`:
-
-  ```
+Records status flip: P-NN narrative-approved → statements-approved
+Commit message:
   feat(pilar): P-NN statements approved (<name>)
 
   N scientific statement(s) and M reference statement(s) drafted under
   ## Scientific Statements; sources cited from the KB manifest.
   Status moved narrative-approved → statements-approved.
   Next: /pilar:run-qc <pillar-path> for Editor + Fact-Checker pass.
-  ```
 
-  Append `; K gaps opened` if Step 8 wrote inline gap entries; `; lexicon: <terms>` if Step 9 added entries.
+  (Append "; K gaps opened" if Step 8 wrote inline gap entries;
+   "; lexicon: <terms>" if drafting added lexicon entries.)
 
-- If status remains `narrative-approved`:
-
-  ```
-  feat(pilar): P-NN statements drafted (<name>)
-
-  N scientific statement(s) and M reference statement(s) drafted.
-  Status remains narrative-approved pending Editor + Fact-Checker
-  pass and user approval. Re-run /pilar:pillar-statements P-NN to
-  refine and mark statements-approved when ready.
-  ```
-
-  Same gap / lexicon append rules.
-
-Wait for explicit user approval. On approval:
-
-```bash
-git add <pillar-path> [lexicon.md] [registers/evidence-gaps.md]
-git commit -m "$(cat <<'EOF'
-... approved message ...
-EOF
-)"
+Reply: approve / revise message: <new> / defer (leave status at narrative-approved, do not commit)
 ```
 
-If the user revises, accept. If the user defers, **stop** without committing — the working tree retains the edits.
+- **`approve`** → Edit pillar frontmatter `status` → `statements-approved`. Then `git add <pillar-path> [lexicon.md] [registers/evidence-gaps.md] && git commit -m "<approved message>"`.
+- **`revise message: <new>`** → use the new message; restate the prompt; wait for `approve`.
+- **`defer`** (or anything else) → leave `status: narrative-approved`. Do not commit. The working tree retains edits. Re-running the command later (additive case) is allowed; the `defer-until-sprint-close` semantic is preserved.
 
-### Step 12 — Brief the user on next steps
+For the additive case (status was already `statements-approved` when the run started), the gate is the same shape but the "status flip" line reads `(no flip — additive run; status remains statements-approved)` and the message body reflects "additional N statements appended" rather than "approved".
+
+### Step 10 — Brief the user on next steps
 
 Tell the user (substituting):
 
