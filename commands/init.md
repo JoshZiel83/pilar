@@ -193,6 +193,7 @@ Sprint engine:
 - `/pilar:sprint-plan` — open a new sprint (drafts the plan from roadmap state and prior sprint summary; you approve before commit).
 - `/pilar:sprint-close` — close the active sprint at the §5.3 checkpoint (drafts the summary; you respond Confirm / Request revisions / Defer / Rewind).
 - `/pilar:sprint-amend` — amend the active sprint plan in flight if scope changes during execution.
+- `/pilar:sprint-pause` — snapshot mid-sprint progress without closing. Appends a dated sub-section to the active plan's `## Pause Notes` and commits.
 
 KB and research:
 
@@ -203,7 +204,7 @@ KB and research:
 Per-pillar drafting:
 
 - `/pilar:scaffold-pillars` — once-per-engagement: propose the §6.4 default pillar set tailored to the briefing; write stubs; populate roadmap's `## Pillars` table.
-- `/pilar:explore <P-NN> [--angle "<text>"]` — bounded, hypothesis-driven exploration of KB source content for one pillar. Produces optional synthesis note in `explorations/<pillar-id>.md`.
+- `/pilar:explore <P-NN> [--instruction "<text>"]` — per-pillar exploration of KB source content driven by a free-form instruction (hypothesis, open question, or directive). Agent decides what to read; save+commit are one decision. Produces optional synthesis note in `explorations/<pillar-id>.md`.
 - `/pilar:pillar-narrative <P-NN>` — draft Strategic Rationale, Narrative, Scope. Mark `narrative-approved` at end.
 - `/pilar:pillar-statements <P-NN>` — draft Scientific Statements + Reference Statements. Runs orphan-RS scan; mark `statements-approved` at end.
 
