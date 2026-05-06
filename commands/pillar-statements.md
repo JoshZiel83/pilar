@@ -4,7 +4,7 @@ allowed-tools: Bash, Read, Write, Edit
 argument-hint: <pillar-id>
 ---
 
-Draft the `## Scientific Statements` section of one pillar (per §7.5 / §6.5): SS-NN entries (each with `status`, dates, statement paragraph, strategic argument) and the nested RS-NN entries under each SS (each with `status`, `sources: [<ref-id>, …]`, dates, free-text reference statement). Refuses unless the pillar is at `narrative-approved` (or higher, for additive runs). Iterates with the user one SS at a time. Each RS picks sources from `knowledge-base/manifest.md` entries the writer chooses from. Append-only IDs per `docs/CONVENTIONS.md` (highest existing + 1; never reuses retired ids — relevant on rewind).
+Draft the `## Scientific Statements` section of one pillar (per §7.5 / §6.5): SS-NN entries (each with `status`, dates, statement paragraph, strategic argument) and the nested RS-NN entries under each SS (each with `status`, `sources: [<ref-id>, …]`, dates, free-text reference statement). Refuses unless the pillar is at `narrative-approved` (or higher, for additive runs). Decomposes the approved narrative into a full SS slate, walks the writer through one macro review of the slate, persists the SS slate to the pillar file, drafts RS into the file under each SS, then walks one macro review of the SS+RS pairs against the persisted file. Each RS picks sources from `knowledge-base/manifest.md` entries; no ref-ids are invented. Append-only IDs per `docs/CONVENTIONS.md` (highest existing + 1; never reuses retired ids — relevant on rewind).
 
 After drafting, runs `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py` against the pillar to flag orphan RS — those whose sources are missing, empty, or cite ref-ids not in the manifest. Surfaces orphans for inline `GAP-NNN` drafting (mirroring `/pilar:ingest-kb` Step 12) or defers to a follow-up `/pilar:ingest-kb` invocation.
 
@@ -54,49 +54,71 @@ Read these:
 - `briefing.md` — `## Strategic Priorities` and `## Audiences` are the most relevant; the SS's strategic argument should tie to a numbered priority.
 - `knowledge-base/manifest.md` — capture every `### <ref-id>` entry's id, `type`, and `key_findings`. This is the source pool the writer picks from when drafting each RS's `sources:`.
 
-### Step 4 — Iteratively draft scientific statements with the user
+### Step 4 — Decompose-first SS/RS drafting (two macro reviews)
 
-Loop. For each new SS:
+The earlier per-SS micro-loop interleaved claim wording with sourcing and RS drafting, which forced the writer to commit to claim wording before seeing the full slate of claims. The narrative phase already uses a better cadence (one composition, one macro review); this command now matches that shape, with two macro reviews — one on the SS slate as a decomposition of the narrative, one on the SS+RS pairs as written to the pillar file.
 
-1. Propose `SS-<next_ss_n>` with:
-   - **Title** — short, concrete (e.g., "Pivotal Phase 2 efficacy in r/r DLBCL").
-   - **Statement paragraph** — single paragraph in dry scientific tone per §6.6 / §9. State the scientific claim concretely; avoid §9 disallowed patterns at draft time (the Editor will catch any that slip in).
-   - **Strategic argument** — one paragraph on why this statement matters to the pillar; tie to a specific Strategic Priority from the briefing. Be concrete about the differentiation or value claim it advances.
-   Refine with the user until the SS is right.
-2. Loop on RS within this SS. For each new RS:
-   - Compute `next_rs_n = max(existing RS within this SS) + 1` (or `01` if first).
-   - Propose `RS-<next_rs_n>`:
-     - **Title** — short and concrete.
-     - **Status** — `draft`.
-     - **sources** — `[<ref-id>, <ref-id>, …]`. **Surface relevant manifest entries** based on the RS topic (e.g., for an "elderly subgroup efficacy" RS in a clinical-evidence pillar, surface entries whose `type` is `Single-arm Phase 2 trial` or `Congress abstract` and whose `key_findings` mention subgroup or elderly). Let the user pick the source(s); never invent ref-ids that don't exist in the manifest. If no manifest entry supports the proposed RS, flag this to the user — they can either reshape the RS to fit available evidence, defer this RS until evidence is added, or accept it as an orphan that Step 7 will surface.
-     - **created** / **updated** — today's ISO date (capture via `!date +%F`).
-     - **Body** — free-text reference statement, factual and dry per §7.5. The body's claims must be supportable by the cited source(s); the Fact-Checker will evaluate this in run-qc. Do not overstate; hedge appropriately for source strength.
-   - Refine with the user until the RS is right.
-   - Ask: *"Add another RS to SS-NN?"* — loop until the user is done with this SS.
-3. Ask: *"Add another SS to this pillar?"* — loop until the user is done with the pillar.
+#### Step 4a — Propose the full SS slate
 
-Be brief. One or two short refinement rounds per SS / RS is the goal — over-refining at draft time wastes effort the Editor can spot more efficiently in the QC pass.
+Read the pillar's approved `## Strategic Rationale`, `## Narrative`, and `## Scope` sections (Step 3 already captured these). Decompose the narrative into the granular ideas it makes and propose a full slate of `SS-<next_ss_n>` … `SS-<next_ss_n + k - 1>` — each with **Title**, **Statement paragraph**, and **Strategic argument**, framed as the granular claims that comprise the approved narrative.
 
-### Step 5 — Insert the drafted SS/RS structure into the pillar file
+**No sources, no reference statements at this stage.** This is a decomposition of the narrative into its constituent claims; sourcing follows after the decomposition is right.
 
-Compose the SS/RS markdown blocks per the §7.5 schema layout (each SS body has `**Statement.**` and `**Strategic Argument.**` paragraphs and a `**Reference Statements.**` heading; each RS body has its frontmatter-style fields and a free-text reference paragraph).
+In **additive runs** (status was already `statements-approved` when the run started): the slate scopes to "propose new SS to add" only — existing SS are not re-proposed and are not edited.
+
+#### Step 4b — Joint review of the SS slate (first macro review)
+
+Surface the proposed slate as a single artifact. Iterate with the user — adding, removing, splitting, merging, rewording — until the slate is right. The decomposition is a single intellectual judgment about coverage, balance, and overlap against the narrative, made *before* sourcing pressure can reshape claim wording.
+
+Be a partner in this review: flag balance issues ("SS-02 and SS-04 cover overlapping ground; consider merging"), point out gaps ("the narrative claims durability but no SS in the slate operationalizes that"), suggest reorderings. Iterate until the user is satisfied with the slate as a whole.
+
+Lexicon proposals are captured inline here (same pattern as `/pilar:pillar-narrative` Step 5): when a term decision surfaces during slate iteration, accumulate it in `lexicon_additions` for the Step 9 commit; no dedicated lexicon-prompt step at the end.
+
+#### Step 4c — Persist the SS slate to the pillar file
+
+Write the agreed slate to the pillar's `## Scientific Statements` section. Each SS block per the §7.5 schema layout: `### SS-NN: <title>` heading, then the **Statement** paragraph and **Strategic Argument** paragraph; under each SS leave a `**Reference Statements.** _TBD — drafted in 4d._` placeholder so Step 4d can fill it in.
 
 Use Edit:
 
-- **First-pass case** (existing `## Scientific Statements` body is the M1 `_TBD_` placeholder): the `old_string` matches the section heading + the `_TBD_` placeholder line; the `new_string` is the section heading + the drafted SS/RS blocks.
-- **Additive case** (existing SS already present): the `old_string` matches the last few lines of the final existing SS/RS block (with trailing whitespace); the `new_string` is those same lines plus the new SS/RS blocks. Do not modify any existing SS/RS content — append-only at this granularity too.
+- **First-pass case** (existing `## Scientific Statements` body is the M1 `_TBD_` placeholder): the `old_string` matches the section heading + the placeholder; the `new_string` is the heading + the SS slate with `_TBD_` RS placeholders.
+- **Additive case** (existing SS already present): append the new SS blocks after the last existing SS, with `_TBD_` RS placeholders. Do not modify existing SS/RS content — append-only at this granularity too.
 
-### Step 6 — Update frontmatter `updated:`
+This is a working-draft persist, not a commit. The full `_TBD_` → RS resolution happens in 4d→4e and only commits at Step 9.
+
+#### Step 4d — Draft RS per SS into the pillar file
+
+For each SS in the slate (or each new SS in the additive case): surface the manifest entries most relevant to the SS's claim, **draft the supporting RS slate, and write the drafted RS directly into the pillar file under their SS** (replacing the `_TBD_` placeholder from 4c). At this stage there is trust that Claude can make a competent first attempt — the writer reviews the *persisted* RS in 4e, not a chat-first walkthrough of every RS.
+
+Per RS:
+
+- Compute `next_rs_n = max(existing RS within this SS) + 1` (or `01` if first).
+- **Title** — short and concrete.
+- **Status** — `draft`.
+- **sources** — `[<ref-id>, <ref-id>, …]`, picked from `knowledge-base/manifest.md` only; never invent ref-ids that don't exist in the manifest. Choose by topical relevance per the manifest entry's `type` and `key_findings`. If no manifest entry supports a claim the SS's decomposition implies, draft the RS anyway with `sources: []` — Step 7's orphan-RS scan will surface it for the writer's gap-creation decision rather than blocking the drafting flow here.
+- **created** / **updated** — today's ISO date.
+- **Body** — free-text reference statement, factual and dry per §7.5 / §6.6 / §9. Hedge appropriately for source strength; the Fact-Checker will catch overstatement during QC.
+
+Use Edit, one Edit per SS, replacing the SS's `_TBD_` RS placeholder with the drafted RS slate. Preserve the SS's Statement and Strategic Argument paragraphs verbatim.
+
+#### Step 4e — Joint review of SS+RS pairs against the persisted pillar file (second macro review)
+
+The pillar file is now in its proposed end state. Walk each SS with its drafted RS together with the writer, reviewing against the persisted file (use `git diff <pillar_path>` to surface the change set in one view). Refine via Edit on the file — do not regenerate the SS/RS section wholesale.
+
+Be brief. One or two short refinement rounds is the goal — heavy refinement of RS prose is the Editor's job, and source-strength judgments are the Fact-Checker's; the writer's job in 4e is to confirm decomposition, sourcing choices, and overall coverage.
+
+Lexicon additions captured during 4b/4d/4e accumulate in `lexicon_additions`; they are written to `lexicon.md` alongside the pillar edit in Step 9's commit.
+
+### Step 5 — Update frontmatter `updated:`
 
 Edit the pillar's frontmatter `updated:` field to today's ISO date.
 
-### Step 7 — Validate
+### Step 6 — Validate
 
 Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py <pillar_path>` (substituting the captured `<pillar_path>`).
 
 The validator enforces SS-NN / RS-NN format, uniqueness within scope (no duplicate SS-NN within the pillar; no duplicate RS-NN within an SS), and `sources: [<ref-id>, …]` format. If validation fails, surface errors and correct via Edits before continuing.
 
-### Step 8 — Orphan-RS check
+### Step 7 — Orphan-RS check
 
 Run `python3 ${CLAUDE_PLUGIN_ROOT}/scripts/detect-gaps.py <pillar_path> knowledge-base/manifest.md --format json` (substituting the captured `<pillar_path>`).
 
@@ -111,11 +133,11 @@ Ask the user: *"Append these gap entries inline (commit alongside the pillar) or
 - **Inline** → Edit `registers/evidence-gaps.md` to append the gaps under `## Open Gaps`. Update its frontmatter `updated:`. Validate via !`python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-schemas.py registers/evidence-gaps.md`.
 - **Defer** → leave `registers/evidence-gaps.md` untouched; the orphans will resurface the next time `/pilar:ingest-kb` runs against new files or the next time this pillar (or another) is drafted via `/pilar:pillar-statements`.
 
-### Step 9 — Approve commit (status flip + commit in one gate)
+### Step 8 — Approve commit (status flip + commit in one gate)
 
-Run `git status` to show changes (pillar file, optionally `lexicon.md` if lexicon additions were captured during drafting iteration, optionally `registers/evidence-gaps.md` from Step 8 inline-gap branch).
+Run `git status` to show changes (pillar file, optionally `lexicon.md` if lexicon additions were captured during drafting iteration, optionally `registers/evidence-gaps.md` from Step 7 inline-gap branch).
 
-Lexicon proposals are captured **inline during drafting** (same pattern as `/pilar:pillar-narrative` Step 5): when the user accepts a term decision in iteration, the proposal accumulates in a running `lexicon_additions` list; the actual lexicon write happens in Step 5's persistence step (or in a sub-step of the decompose-first restructure, when that lands). No dedicated lexicon-prompt step at the end — the user's term decisions during drafting *are* the approval.
+Lexicon proposals are captured **inline during the macro reviews in Step 4** (4b, 4d, 4e). When the user accepts a term decision in iteration, the proposal accumulates in `lexicon_additions`; the lexicon write lands alongside the pillar edit in this commit. No dedicated lexicon-prompt step at the end — the user's term decisions during drafting *are* the approval.
 
 Propose the commit message **and** the implied status flip in one prompt. The commit message records the status flip, so the prior pattern of asking "mark approved?" then "approve commit?" had the user authorizing the same decision twice.
 
@@ -131,7 +153,7 @@ Commit message:
   Status moved narrative-approved → statements-approved.
   Next: /pilar:run-qc <pillar-path> for Editor + Fact-Checker pass.
 
-  (Append "; K gaps opened" if Step 8 wrote inline gap entries;
+  (Append "; K gaps opened" if Step 7 wrote inline gap entries;
    "; lexicon: <terms>" if drafting added lexicon entries.)
 
 Reply: approve / revise message: <new> / defer (leave status at narrative-approved, do not commit)
@@ -143,7 +165,7 @@ Reply: approve / revise message: <new> / defer (leave status at narrative-approv
 
 For the additive case (status was already `statements-approved` when the run started), the gate is the same shape but the "status flip" line reads `(no flip — additive run; status remains statements-approved)` and the message body reflects "additional N statements appended" rather than "approved".
 
-### Step 10 — Brief the user on next steps
+### Step 9 — Brief the user on next steps
 
 Tell the user (substituting):
 
